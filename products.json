@@ -39,7 +39,7 @@
         "name_en": "Oil Filter Perodua (OLD)",
         "name_bm": "Penapis Minyak Enjin Perodua (LAMA)",
         "price": 18,
-        "main_img": "img_market/filter/filter_perodua_01.jpeg",
+        "main_img": "img_market/filter/filter_perodua_01.jpg",
         "gallery": ["img_market/filter/filter_perodua_01a.jpeg", "img_market/filter/filter_perodua_01b.jpeg", "img_market/filter/filter_perodua_01c.jpeg"],
         "type": "15601-00R01",
         "grade": "Original",
