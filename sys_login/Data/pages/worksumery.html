@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Service Summary - Ver 2026 beta</title>
+    <style>
+        /* --- SCREEN STYLES --- */
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
+        .container { 
+            max-width: 850px; 
+            margin: auto; 
+            background: white; 
+            padding: 40px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            border-radius: 8px;
+        }
+        .header { display: flex; align-items: center; border-bottom: 3px solid #333; padding-bottom: 20px; margin-bottom: 25px; }
+        .header img { height: 80px; width: auto; margin-right: 20px; }
+        .company-info h2 { margin: 0; color: #1a1a1a; }
+        .company-info p { margin: 2px 0; font-size: 14px; color: #666; }
+        
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
+        .field-group label { font-weight: bold; font-size: 13px; display: block; color: #444; }
+        input, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; font-size: 14px; }
+        
+        h3 { background: #333; color: white; padding: 10px; font-size: 16px; margin-top: 30px; border-radius: 4px; }
+        
+        .image-card { 
+            border: 1px solid #eee; 
+            padding: 15px; 
+            margin-bottom: 20px; 
+            border-radius: 6px; 
+            background: #fafafa;
+            page-break-inside: avoid; /* Prevents splitting across pages */
+        }
+        .img-preview { max-width: 100%; height: auto; border-radius: 4px; margin: 10px 0; display: none; border: 1px solid #ddd; }
+        
+        .btn-add { background: #007bff; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 4px; margin-bottom: 10px; font-weight: bold; }
+        .btn-remove { background: #ff4d4d; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 4px; margin-top: 5px; font-size: 12px; }
+        .btn-print { background: #28a745; color: white; border: none; padding: 15px 40px; cursor: pointer; border-radius: 6px; font-size: 18px; font-weight: bold; width: 100%; margin-top: 40px; }
+        .btn-print:hover { background: #218838; }
+
+        /* --- PRINT STYLES --- */
+        @media print {
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; width: 100%; max-width: 100%; padding: 0; margin: 0; }
+            .no-print { display: none !important; } /* Hides buttons and file inputs */
+            input, textarea { border: none; padding: 5px 0; background: transparent; }
+            .image-card { border: 1px solid #ccc; background: white; margin-bottom: 30px; }
+            h3 { background: #f0f0f0 !important; color: black !important; border: 1px solid #ccc; }
+            @page { margin: 1.5cm; } /* Sets page margins for the printer */
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="printable-form">
+    <!-- Header Section -->
+    <div class="header">
+        <img src="images/logob.png" alt="Logo">
+        <div class="company-info">
+            <h2 contenteditable="true">JT Auto Services</h2>
+            <p>SSM: <span contenteditable="true">202503349561 -JR0185602-</span></p>
+            <p>Tel: <span contenteditable="true">+60 16-5250890</span></p>
+            <p contenteditable="true">Lot 277E, Kampung Semarang BT30, Jalan Kajang Dengkil BT30, 43800 Dengkil, Selangor</p>
+        </div>
+    </div>
+
+    <!-- Info Grid -->
+    <div class="grid">
+        <div class="field-group"><label>DATE</label><input type="date" value="2026-01-04"></div>
+        <div class="field-group"><label>BILL NO</label><input type="text" placeholder="INV/2026/001"></div>
+        <div class="field-group"><label>CUSTOMER NAME</label><input type="text"></div>
+        <div class="field-group"><label>TEL NO</label><input type="text"></div>
+        <div class="field-group"><label>NO PLATE</label><input type="text"></div>
+        <div class="field-group"><label>CAR MODEL</label><input type="text"></div>
+    </div>
+
+    <!-- Work Summary -->
+    <h3>WORK SUMMARY</h3>
+    <div id="work-summary-list"></div>
+    <button class="btn-add no-print" onclick="addNewSection('work-summary-list')">+ Add Work Photo & Note</button>
+
+    <!-- Next Service -->
+    <h3>NEXT SERVICE SECTION</h3>
+    <div id="next-service-list"></div>
+    <button class="btn-add no-print" onclick="addNewSection('next-service-list')">+ Add Service Photo & Note</button>
+</div>
+
+<!-- Print Button -->
+<div style="max-width: 850px; margin: auto;">
+    <button class="btn-print no-print" onclick="window.print()">Create Records</button>
+</div>
+
+<script>
+    // Function to add a new image + note block
+    function addNewSection(containerId) {
+        const container = document.getElementById(containerId);
+        const div = document.createElement('div');
+        div.className = 'image-card';
+        
+        div.innerHTML = `
+            <input type="file" accept="image/*" class="no-print" onchange="handleImage(this)">
+            <img class="img-preview" alt="Preview">
+            <textarea placeholder="Enter description/notes here..."></textarea>
+            <button class="btn-remove no-print" onclick="this.parentElement.remove()">Remove This Item</button>
+        `;
+        
+        container.appendChild(div);
+    }
+
+    // Function to handle image preview
+    function handleImage(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            const previewImg = input.nextElementSibling;
+            
+            reader.onload = function(e) {
+                previewImg.src = e.target.result;
+                previewImg.style.display = 'block';
+                input.style.display = 'none'; // Hide file input once image is loaded
+            }
+            
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
+
+</body>
+</html>

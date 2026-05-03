@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>J T Services Invoice</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background: #f4f4f4; color: #333; }
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-radius: 8px; }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 0.85em; color: #555; }
+        input, textarea, select { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; font-size: 1em; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #f8f9fa; font-size: 0.9em; }
+        
+        .btn { padding: 10px 20px; background: #28a745; color: white; border: none; cursor: pointer; border-radius: 4px; font-weight: bold; margin-top: 10px; }
+        .btn-print { background: #007bff; width: 100%; font-size: 1.1em; margin-top: 20px; }
+        .btn-danger { background: #dc3545; padding: 5px 10px; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        
+        #invoice-preview { display: none; background: white; padding: 40px; min-height: 1000px; }
+
+        @media print {
+            .no-print { display: none !important; }
+            #invoice-preview { display: block !important; margin: 0; padding: 0; width: 100%; }
+            body { background: white; padding: 0; }
+            @page { size: A4; margin: 1.5cm; }
+        }
+
+        .invoice-header { display: flex; justify-content: space-between; border-bottom: 3px solid #333; padding-bottom: 20px; margin-bottom: 20px; }
+        .company-section { display: flex; flex-direction: column; gap: 10px; }
+        #logoPreview { max-height: 150px; max-width: 300px; width: auto; object-fit: contain; display: block; margin-bottom: 15px; }
+        .company-info h1 { margin: 0; font-size: 1.6em; }
+        .company-details { font-size: 0.9em; line-height: 1.4; color: #444; }
+
+        .client-info-box { display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 0.95em; border: 1px solid #eee; padding: 15px; border-radius: 5px; }
+        .total-section { text-align: right; margin-top: 30px; font-size: 1.4em; font-weight: bold; padding-top: 10px; }
+        .item-extra { font-size: 0.8em; color: #666; font-style: italic; display: block; margin-top: 2px; }
+    </style>
+</head>
+<body>
+
+<div class="container no-print">
+    <h2 style="border-bottom: 2px solid #eee; padding-bottom: 10px;">📝 JT Auto Services Billing System</h2>
+    
+    <!-- Info Syarikat -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div class="input-group">
+            <label>Logo Syarikat:</label>
+            <input type="file" id="logoInput" accept="image/*" onchange="previewLogo(this)">
+        </div>
+        <div class="input-group">
+            <label>No. Invois:</label>
+            <input type="text" id="invNo" placeholder="Contoh: INV-1001" oninput="updateInvoice()">
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div class="input-group">
+            <label>Nama Syarikat:</label>
+            <input type="text" id="myCompany" value="JT Auto Services" oninput="updateInvoice()">
+        </div>
+        <div class="input-group">
+            <label>No. Tel Syarikat:</label>
+            <input type="text" id="myPhone" value="016-5250890" oninput="updateInvoice()">
+        </div>
+    </div>
+
+    <div class="input-group">
+        <label>Alamat & Email Syarikat:</label>
+        <textarea id="myAddress" rows="2" oninput="updateInvoice()">SSM Reg No:202503349561 -JR0185602-&#10;Lot 277E, Kampung Semarang BT30&#10;Jalan Kajang Dengkil BT30&#10;43800 Dengkil&#10;Selangor&#10;Email: jep.tiah@gmail.com</textarea>
+    </div>
+
+    <div class="input-group">
+        <label>Butiran Pembayaran (Bank/QR):</label>
+        <textarea id="paymentDetails" rows="2" oninput="updateInvoice()">Bank: Maybank Berhad&#10;No. Akaun: 151575067459&#10;Nama Penerima: Jaefri Bin Supa'at</textarea>
+    </div>
+
+    <hr>
+
+    <!-- Info Pelanggan & Kenderaan -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        <div class="input-group">
+            <label>Nama Pelanggan:</label>
+            <input type="text" id="clientName" placeholder="Contoh: Jaefri" oninput="updateInvoice()">
+        </div>
+        <div class="input-group">
+            <label>No. Tele Pelanggan:</label>
+            <input type="text" id="clientContact" placeholder="016-5250890" oninput="updateInvoice()">
+        </div>
+        <div class="input-group">
+            <label>No. Plate Kenderaan:</label>
+            <input type="text" id="plateNo" placeholder="Contoh: JXB 2663" oninput="updateInvoice()">
+        </div>
+        <div class="input-group">
+            <label>Butiran Kenderaan:</label>
+            <input type="text" id="vehDetails" placeholder="Contoh: Honda Civic (White)" oninput="updateInvoice()">
+        </div>
+        <div class="input-group">
+            <label>Tarikh:</label>
+            <input type="date" id="billDate" oninput="updateInvoice()">
+        </div>
+    </div>
+
+    <h3>Senarai Servis & Barang</h3>
+    <table id="inputTable">
+        <thead>
+            <tr>
+                <th>Perkara & Butiran Tambahan</th>
+                <th width="80">Qty</th>
+                <th width="120">Harga (RM)</th>
+                <th width="50"></th>
+            </tr>
+        </thead>
+        <tbody id="itemRows"></tbody>
+    </table>
+    
+    <button class="btn" onclick="addRow()">+ Tambah Item</button>
+
+    <div class="input-group" style="margin-top: 20px;">
+        <label>Telah Dibayar Secara</label>
+        <select id="paymentMethod" onchange="updateInvoice()">
+            <option value="Tunai (Cash)">Tunai (Cash)</option>
+            <option value="Perbankan Dalam Talian (Online Banking)">Perbankan Dalam Talian (Online Banking)</option>
+            <option value="Kod QR (QR Code)">QR Pay (QR Code)</option>
+        </select>
+    </div>
+
+    <button class="btn btn-print" onclick="window.print()">🖨️ Simpan sebagai PDF</button>
+</div>
+
+<!-- PREVIEW INVOIS -->
+<div id="invoice-preview">
+    <div class="invoice-header">
+        <div class="company-section">
+            <img id="logoPreview" src="" alt="Logo" style="display: none;">
+            <div class="company-info">
+                <h1 id="dispMyCompany">JT Auto Services</h1>
+                <div class="company-details">
+                    <div id="dispMyAddress"></div>
+                    <div>Tel: <span id="dispMyPhone"></span></div>
+                </div>
+            </div>
+        </div>
+        <div style="text-align: right;">
+            <h2 style="margin:0; color: #007bff; font-size: 2.5em;">Receipt</h2>
+            <p><strong>No:</strong> <span id="dispInvNo"></span></p>
+            <p><strong>Tarikh:</strong> <span id="dispDate"></span></p>
+        </div>
+    </div>
+
+    <div class="client-info-box">
+        <div>
+            <strong>KEPADA:</strong><br>
+            <span id="dispClientName">-</span><br>
+            Tel: <span id="dispClientContact">-</span>
+        </div>
+        <div style="text-align: right;">
+            <strong>KENDERAAN:</strong><br>
+            No. Plate: <span id="dispPlate" style="font-weight: bold;">-</span><br>
+            Model: <span id="dispVehDetails">-</span>
+        </div>
+    </div>
+
+    <table id="invoiceTable">
+        <thead>
+            <tr>
+                <th>Keterangan</th>
+                <th style="text-align: center;">Qty</th>
+                <th style="text-align: right;">Unit (RM)</th>
+                <th style="text-align: right;">Jumlah (RM)</th>
+            </tr>
+        </thead>
+        <tbody id="dispItems"></tbody>
+    </table>
+
+    <div class="total-section">
+        Jumlah Besar: RM <span id="grandTotal">0.00</span>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
+        <div style="width: 60%;">
+            <strong>Telah Dibayar Secara</strong> <span id="dispPaymentMethod" style="font-weight: bold; color: #007bff;"></span><br>
+            <p id="dispPaymentDetails" style="white-space: pre-wrap; font-size: 0.85em; margin-top: 5px;"></p>
+        </div>
+        <div style="width: 30%; text-align: right;">
+            <p style="border-bottom: 1px solid #000; margin-top: 40px;"></p>
+            <p>Salinan Digital</p>
+        </div>
+    </div>
+        <div style="margin-top: 50px; font-size: 0.85em; line-height: 1.6;">
+        <p><strong>Nota:</strong> Barang yang telah dijual tidak boleh dikembalikan. Sila simpan resit ini untuk rujukan servis akan datang.&#10;Terima Kasih kerana telah mengunakan perkhidmatan kami</p>
+    </div>
+</div>
+
+<script>
+    function addRow() {
+        const tbody = document.getElementById('itemRows');
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>
+                <input type="text" class="item-desc" placeholder="Nama Barang/Servis" oninput="updateInvoice()">
+                <input type="text" class="item-extra-input" placeholder="Butiran tambahan (cth: 5W-40)" style="font-size: 0.8em; margin-top:5px;" oninput="updateInvoice()">
+            </td>
+            <td><input type="number" class="item-qty" value="1" oninput="updateInvoice()"></td>
+            <td><input type="number" class="item-price" value="0.00" step="0.01" oninput="updateInvoice()"></td>
+            <td><button class="btn-danger" onclick="this.parentElement.parentElement.remove(); updateInvoice()">X</button></td>
+        `;
+        tbody.appendChild(row);
+        updateInvoice();
+    }
+
+    function previewLogo(input) {
+        const preview = document.getElementById('logoPreview');
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = (e) => { preview.src = e.target.result; preview.style.display = 'block'; }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function updateInvoice() {
+        document.getElementById('dispMyCompany').innerText = document.getElementById('myCompany').value;
+        document.getElementById('dispMyAddress').innerText = document.getElementById('myAddress').value;
+        document.getElementById('dispMyPhone').innerText = document.getElementById('myPhone').value;
+        document.getElementById('dispInvNo').innerText = document.getElementById('invNo').value;
+        document.getElementById('dispDate').innerText = document.getElementById('billDate').value;
+        document.getElementById('dispClientName').innerText = document.getElementById('clientName').value || "-";
+        document.getElementById('dispClientContact').innerText = document.getElementById('clientContact').value || "-";
+        document.getElementById('dispPlate').innerText = document.getElementById('plateNo').value || "-";
+        document.getElementById('dispVehDetails').innerText = document.getElementById('vehDetails').value || "-";
+        document.getElementById('dispPaymentMethod').innerText = document.getElementById('paymentMethod').value;
+        document.getElementById('dispPaymentDetails').innerText = document.getElementById('paymentDetails').value;
+
+        const rows = document.querySelectorAll('#itemRows tr');
+        const dispTbody = document.getElementById('dispItems');
+        dispTbody.innerHTML = '';
+        let total = 0;
+
+        rows.forEach(row => {
+            const desc = row.querySelector('.item-desc').value;
+            const extra = row.querySelector('.item-extra-input').value;
+            const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
+            const price = parseFloat(row.querySelector('.item-price').value) || 0;
+            const subtotal = qty * price;
+            total += subtotal;
+
+            if(desc) {
+                dispTbody.innerHTML += `<tr>
+                    <td>
+                        <strong>${desc}</strong>
+                        ${extra ? `<span class="item-extra">${extra}</span>` : ''}
+                    </td>
+                    <td style="text-align: center;">${qty}</td>
+                    <td style="text-align: right;">${price.toFixed(2)}</td>
+                    <td style="text-align: right;">${subtotal.toFixed(2)}</td>
+                </tr>`;
+            }
+        });
+        document.getElementById('grandTotal').innerText = total.toFixed(2);
+    }
+
+    window.onload = () => { addRow(); updateInvoice(); };
+</script>
+</body>
+</html>

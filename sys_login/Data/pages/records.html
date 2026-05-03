@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JT Auto Services Ledger</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; margin: 20px; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        h1 { color: #1a73e8; text-align: center; margin-bottom: 5px; }
+        p.subtitle { text-align: center; color: #666; margin-bottom: 30px; }
+        
+        .balance-card { background: #1a73e8; color: white; padding: 20px; border-radius: 8px; text-align: center; margin-bottom: 25px; }
+        .balance-card h2 { margin: 0; font-size: 2em; }
+
+        form { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; background: #fafafa; padding: 20px; border-radius: 8px; border: 1px solid #eee; }
+        .form-group { display: flex; flex-direction: column; }
+        label { font-weight: 600; margin-bottom: 5px; color: #444; font-size: 0.9em; }
+        input, select { padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 1em; }
+        
+        button { grid-column: span 1; padding: 12px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 10px; transition: background 0.3s; }
+        button:hover { background-color: #218838; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 30px; background: white; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background-color: #f8f9fa; color: #555; text-transform: uppercase; font-size: 0.8em; }
+        .credit { color: #28a745; font-weight: bold; }
+        .debit { color: #dc3545; font-weight: bold; }
+        .rm-symbol { font-size: 0.9em; color: #888; margin-right: 2px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>JT Auto Services</h1>
+    <p class="subtitle">Financial Transaction Record</p>
+
+    <div class="balance-card">
+        <small>Current Balance</small>
+        <h2>RM <span id="totalBalance">0.00</span></h2>
+    </div>
+
+    <form id="recordForm">
+        <div class="form-group">
+            <label for="date">Date</label>
+            <input type="date" id="date" required>
+        </div>
+        <div class="form-group" style="flex-grow: 2;">
+            <label for="detail">Detail / Description</label>
+            <input type="text" id="detail" placeholder="Nature of transaction" required>
+        </div>
+        <div class="form-group">
+            <label for="amount">Amount (RM)</label>
+            <input type="number" id="amount" step="0.01" placeholder="0.00" required>
+        </div>
+        <div class="form-group">
+            <label for="type">Type</label>
+            <select id="type">
+                <option value="credit">Debit (Income)</option>
+                <option value="debit">Credit (Expense)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="payment">Payment Via</label>
+            <select id="payment">
+                <option value="Cash">Cash</option>
+                <option value="Online Banking">Online Banking</option>
+                <option value="QR Code">QR Code</option>
+            </select>
+        </div>
+        <button type="submit">Add Record</button>
+    </form>
+
+    <table id="ledgerTable">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Detail</th>
+                <th>Payment Via</th>
+                <th>Type</th>
+                <th>Amount (RM)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Dynamic Rows  -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    // 1. Auto-fill Todays Date
+    window.onload = function() {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('date').value = today;
+    };
+
+    let balance = 0;
+    const form = document.getElementById('recordForm');
+    const tableBody = document.querySelector('#ledgerTable tbody');
+    const balanceDisplay = document.getElementById('totalBalance');
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // Input Data
+        const date = document.getElementById('date').value;
+        const detail = document.getElementById('detail').value;
+        const amount = parseFloat(document.getElementById('amount').value);
+        const type = document.getElementById('type').value;
+        const payment = document.getElementById('payment').value;
+
+        // Update Running Balance
+        if (type === 'credit') {
+            balance += amount;
+        } else {
+            balance -= amount;
+        }
+
+        // Create Table Row
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${date}</td>
+            <td>${detail}</td>
+            <td>${payment}</td>
+            <td class="${type}">${type.toUpperCase()}</td>
+            <td><span class="rm-symbol">RM</span>${amount.toFixed(2)}</td>
+        `;
+
+        // Add row to top of list
+        tableBody.prepend(row);
+
+        // Update Balance UI
+        balanceDisplay.textContent = balance.toFixed(2);
+
+        // Reset fields (keeping the date as current)
+        document.getElementById('detail').value = '';
+        document.getElementById('amount').value = '';
+    });
+</script>
+
