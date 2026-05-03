@@ -1,0 +1,50 @@
+[
+    {
+        "id": "oil-001",
+        "category": "oil-section",
+        "brand": "CASTROL",
+        "badge": "UNIVERSAL",
+        "name_en": "Magnatec 5W-30 (4L)",
+        "name_bm": "Magnatec 5W-30 (4L)",
+        "price": 255,
+        "main_img": "img_market/eoil/e-oil_castrol_01.jpg",
+        "gallery": ["img_market/eoil/e-oil_castrol_01a.jpeg", "img_market/eoil/e-oil_castrol_01b.jpeg", "img_market/eoil/e-oil_castrol_01c.jpg"],
+        "type": "Fully Synthetic",
+        "grade": "API/SP",
+        "desc_en": "Full Synthetic, engine oil designed with intelligent molecules that cling to engine parts, reducing warm-up and stop-start wear by up to 50%. It is suitable for modern petrol, diesel, and hybrid engines requiring API SP or ACEA A3/B4 specifications, offering superior protection during crucial startup.",
+        "desc_bm": "Vehicle Types: Passenger cars, SUVs, and light-duty diesel/petrol vehicles.",
+        "shopee_link": "https://s.shopee.com.my/8ASbORqN1M"
+    },
+    {
+        "id": "oil-002",
+        "category": "oil-section",
+        "brand": "PERODUA",
+        "badge": "MYVI / ALZA / BEZZA",
+        "name_en": "Perodua 5W-30 (4L)",
+        "name_bm": "Perodua 5W-30 (4L)",
+        "price": 135,
+        "main_img": "img_market/eoil/e-oil_perodua_01.jpeg",
+        "gallery": ["img_market/eoil/e-oil_perodua_01a.jpg", "img_market/eoil/e-oil_perodua_01b.jpg", "img_market/eoil/e-oil_perodua_01c.webp"],
+        "type": "Fully Synthetic",
+        "grade": "API/SM",
+        "desc_en": "Perodua's 5W-30 engine oil is a semi-synthetic lubricant designed for a balance of fuel economy and engine protection. It is commonly used for Perodua models like the Myvi, Alza, Axia, Bezza, and Viva.",
+        "desc_bm": "Vehicle Types: Passenger cars",
+        "shopee_link": "https://shopee.com.my/your-link"
+    },
+    {
+        "id": "filter-001",
+        "category": "filter-section",
+        "brand": "PERODUA",
+        "badge": "MYVI / ALZA / BEZZA",
+        "name_en": "Oil Filter Perodua (OLD),
+        "name_bm": "Penapis Minyak Enjin Perodua (LAMA)",
+        "price": 18,
+        "main_img": "img_market/filter/filter_perodua_01.jpeg",
+        "gallery": ["img_market/filter/filter_perodua_01a.jpeg", "img_market/filter/filter_perodua_01b.jpeg", "img_market/filter/filter_perodua_01c.jpeg"],
+        "type": "15601-00R01",
+        "grade": "Original",
+        "desc_en": "Perodua's 5W-30 engine oil is a semi-synthetic lubricant designed for a balance of fuel economy and engine protection. It is commonly used for Perodua models like the Myvi, Alza, Axia, Bezza, and Viva.",
+        "desc_bm": "Vehicle Types: Passenger cars",
+        "shopee_link": "https://shopee.com.my/your-link"
+    }
+]

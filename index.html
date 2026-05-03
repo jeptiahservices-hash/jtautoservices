@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JTautoServices | Door2Door Mechanic Services</title>
+    <style>
+        :root {
+            --primary-color: #2563eb; /* Change to #dc2626 for Red theme */
+            --dark-bg: #111827;
+            --card-bg: #1f2937;
+            --text-light: #f3f4f6;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        /* --- HEADER & LOGO --- */
+        header {
+            background: rgba(17, 24, 39, 0.95);
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+
+        .logo-container img {
+            height: 110px; /* Adjust based on your logo shape */
+            vertical-align: middle;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            color: #fff;
+            text-transform: uppercase;
+        }
+
+        /* --- HERO SECTION --- */
+        .hero {
+            padding: 60px 20px;
+            text-align: center;
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
+                        url('images/img_hero_wallpaper.jpeg');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .cta-btn {
+            background: var(--primary-color);
+            color: white;
+            padding: 12px 25px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 20px;
+        }
+
+        /* --- SERVICE/PRODUCT LIST --- */
+        .section-padding { padding: 60px 5%; }
+        h2 { text-align: center; color: var(--primary-color); text-transform: uppercase; margin-bottom: 40px; }
+
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .service-card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .service-card h3 { margin-top: 0; }
+        .price { color: var(--primary-color); font-weight: bold; font-size: 1.2rem; }
+
+        /* --- WORK SHOWCASE (Images/Video) --- */
+        .work-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .work-item {
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .work-item img, .work-item video {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .work-label {
+            padding: 10px;
+            background: var(--card-bg);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* --- MOBILE OPTIMIZATION --- */
+        @media (max-width: 600px) {
+            .logo-text { font-size: 1.2rem; }
+            header { flex-direction: column; gap: 10px; }
+            .hero h1 { font-size: 1.8rem; }
+        }
+
+    .top-bar {
+        display: flex;
+        justify-content: space-between; /* Pushes content to opposite sides */
+        align-items: center;
+        padding: 10px 5%;
+        background: #1f2937;
+        border-bottom: 1px solid #333;
+    }
+
+    .lang-buttons {
+        display: flex;
+        gap: 5px;
+    }
+
+    .login-btn {
+        background: transparent;
+        border: 1px solid var(--primary-color);
+        color: var(--primary-color);
+        padding: 5px 15px;
+        border-radius: 4px;
+        text-decoration: none;
+        font-size: 0.8rem;
+        font-weight: bold;
+        transition: all 0.3s ease;
+    }
+
+    .login-btn:hover {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    /* Keep your existing button styles but scoped to lang-buttons if needed */
+    .lang-buttons button {
+        background: transparent;
+        border: 1px solid #4b5563;
+        color: #9ca3af;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.8rem;
+    }
+
+    .lang-buttons button:hover {
+        border-color: var(--primary-color);
+        color: white;
+    }
+
+.towing-float {
+    position: fixed;
+    bottom: 85px; /* Sits exactly above the WhatsApp button */
+    right: 20px;
+    background-color: #dc2626; /* Warna Button Emergency */
+    color: white;
+    padding: 10px 20px;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    z-index: 1001;
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+    font-weight: bold;
+    animation: pulse 2s infinite; /* Bergetar Button nya */
+}
+
+.towing-icon { margin-right: 8px; font-size: 1.2rem; }
+
+/* Optional: Subtle pulse effect to show urgency */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+        .whatsapp-float {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #25d366;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    z-index: 1001;
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+}
+.whatsapp-float img { width: 25px; margin-right: 10px; }
+
+.faq-item {
+    background: #1f2937;
+    padding: 15px 25px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    text-align: left;
+}
+.faq-item h4 {
+    color: var(--primary-color);
+    margin-bottom: 10px;
+    margin-top: 0;
+}
+.faq-item p {
+    margin: 0;
+    color: #ccc;
+    font-size: 0.95rem;
+}
+
+.choice-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.choice-card {
+    background: var(--card-bg);
+    padding: 30px;
+    border-radius: 12px;
+    text-decoration: none;
+    color: white;
+    text-align: center;
+    border: 1px solid #333;
+    transition: transform 0.3s, border-color 0.3s;
+}
+
+.choice-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary-color);
+}
+
+.choice-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+}
+
+.coming-soon {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-container">
+            <img src="logo.png" alt="Logo" onerror="this.style.display='none'">
+            <span class="logo-text">Door2Door<span style="color:var(--primary-color)">Services</span></span>
+        </div>
+        <a href="tel:+60165250890" class="cta-btn" style="margin-top:0; padding: 8px 15px;">Call Now</a>
+    </header>
+
+    <div class="top-bar">
+    <div class="lang-buttons">
+        <button onclick="setLanguage('en')">English</button>
+        <button onclick="setLanguage('bm')">Bahasa Melayu</button>
+    </div>
+    
+    <a href="sys_login/login.html" class="login-btn" data-en="Login" data-bm="Log Masuk">Login</a>
+</div>
+
+    <section class="hero">
+        <h1 data-en="Service And Repair" data-bm="Baik Pulih Dan Ganti">Service And Repair</h1>
+        <p data-en="From oil changes to engine rebuilds, we treat your car like our own." data-bm="Dari Tukar Minyak Enjin Hingga Baik Pulih Enjin, Kami jaga kereta anda seperti kereta Kami">From oil changes to engine rebuilds, we treat your car like our own.</p>
+        <a href="#work" class="cta-btn">View Our Recent Work</a>
+    </section>
+
+    <div style="display: flex; justify-content: space-around; background: #1f2937; padding: 20px; text-align: center; font-size: 0.9rem; color: #aaa;">
+    <div>
+        <strong style="color: white; display: block;">100% Genuine</strong>
+        Parts Used
+    </div>
+    <div style="border-left: 1px solid #333; border-right: 1px solid #333; padding: 0 20px;">
+        <strong style="color: white; display: block;">Quick Turnaround</strong>
+        Same Day Service
+    </div>
+    <div>
+        <strong style="color: white; display: block;">Expert Team</strong>
+        Experience Mechanics
+    </div>
+</div>
+
+<section class="section-padding">
+    <h2 data-en="What are you looking for?" data-bm="Apa yang anda cari?">What are you looking for?</h2>
+    
+    <div class="choice-grid">
+        <a href="market.html" class="choice-card">
+            <div class="choice-icon">⚙️</div>
+            <h3 data-en="Buy Spare Parts" data-bm="Beli Alat Ganti">Buy Spare Parts</h3>
+            <p data-en="Engine oil, filters, and more." data-bm="Minyak enjin, penapis, dan lain-lain.">Engine oil, filters, and more.</p>
+        </a>
+
+        <a href="https://wa.me/60165250890" class="choice-card">
+            <div class="choice-icon">📅</div>
+            <h3 data-en="Book a Service" data-bm="Buat Temujanji">Book a Service</h3>
+            <p data-en="Schedule your next repair." data-bm="Jadualkan Temujanji seterusnya.">Schedule your next repair.</p>
+        </a>
+        
+        <div class="choice-grid">
+        <a href="sys_mycar/mycar.html" class="choice-card">
+            <div class="choice-icon">🚙</div>
+            <h3 data-en="MyCar" data-bm="MyCar">MyCar</h3>
+            <p data-en="Check Your Car Service Details" data-bm="Semak Butiran Baik Pulih kereta Anda">Check Your Car Service Details</p>
+        </a>
+        
+        <div class="choice-card coming-soon">
+            <div class="choice-icon">🚗</div>
+            <h3 data-en="Car Wash & Detail" data-bm="Cuci & Detailing">Car Wash & Detail</h3>
+            <p data-en="Coming Soon!" data-bm="Akan Datang!">Coming Soon!</p>
+        </div>
+        
+        
+    </div>
+</section>
+
+    <section class="section-padding">
+        <h2>Maintenance & Parts</h2>
+        <div class="service-grid">
+            <div class="service-card">
+                <h3>Engine Oil Change</h3>
+                <p>Includes filter replacement and 21-point safety inspection.</p>
+                <div class="price">From RM150</div>
+            </div>
+            <div class="service-card">
+                <h3>Brake Pad Replacement</h3>
+                <p>High-quality ceramic pads for better stopping power.</p>
+                <div class="price">From RM170</div>
+            </div>
+            <div class="service-card">
+                <h3>Diagnostic Scan</h3>
+                <p>Advanced computer diagnostics to find hidden engine faults.</p>
+                <div class="price">RM60</div>
+            </div>
+        </div>
+    </section>
+
+    <section id="work" class="section-padding" style="background: #1a222f;">
+        <h2>Our Recent Works</h2>
+        <div class="work-gallery">
+            
+            <div class="work-item">
+                <img src="images/img_service1.jpg" alt="Work Done 1">
+                <div class="work-label">Service Kereta Dirumah Pelangan</div>
+            </div>
+
+            <div class="work-item">
+                <img src="images/img_service2.jpg" alt="Work Done 1">
+                <div class="work-label">Penukaran Balljoint dan Lower Arm</div>
+            </div>
+
+            <div class="work-item">
+                <video controls poster="video-thumb.jpg">
+                    <source src="exhaust-sound.mp4" type="video/mp4">
+                    Your browser does not support videos.
+                </video>
+                <div class="work-label">Exhaust Install (Before & After)</div>
+            </div>
+
+            <div class="work-item">
+                <img src="images/img_service3.jpg" alt="Work Done 2">
+                <div class="work-label">Penukaran Bearing Coupling Long Shaft</div>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="contact" class="section-padding" style="background: #111827; border-top: 1px solid #333;">
+    <h2>Get in Touch</h2>
+    <div style="max-width: 800px; margin: 0 auto; text-align: center;">
+        
+        <p style="font-size: 1.2rem; margin-bottom: 30px;">
+            Need a repair or a quote? Contact us directly or visit our shop.
+        </p>
+
+        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-bottom: 40px;">
+            
+            <a href="https://wa.me/60165250890" target="_blank" 
+               style="background: #25d366; color: white; padding: 15px 25px; border-radius: 8px; text-decoration: none; font-weight: bold; display: flex; align-items: center;">
+               <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" width="20" style="margin-right: 10px;">
+               WhatsApp Us
+            </a>
+
+            <a href="tel:+60165250890" 
+               style="background: #2563eb; color: white; padding: 15px 25px; border-radius: 8px; text-decoration: none; font-weight: bold;">
+               Call +6016 525 0890
+            </a>
+
+            <a href="https://maps.app.goo.gl/vs9KbBEYy5Z7jmjk6" target="_blank" 
+               style="background: white; color: #4285F4; border: 2px solid #4285F4; padding: 15px 25px; border-radius: 8px; text-decoration: none; font-weight: bold;">
+               Find us on Google Maps
+            </a>
+
+             <a href="https://maps.app.goo.gl/FmBGax2VacFFZ9WH6" target="_blank" 
+               style="background: hsl(60, 98%, 49%); color: hwb(0 5% 94%); border: 2px solid hwb(0 3% 97%); padding: 15px 25px; border-radius: 8px; text-decoration: none; font-weight: bold;">
+               Rate us on Google Maps
+            </a>
+        </div>
+
+        <div style="background: #1f2937; padding: 30px; border-radius: 12px; display: inline-block; text-align: left;">
+            <p>📍 <strong data-en="Location:" data-bm="Lokasi:">Location:</strong> Kampung Semarang Dengkil Selangor</p>
+            <p>⏰ <strong data-en="Hours:" data-bm="Waktu:">Hours:</strong> Mon - Sat: 8:00 AM - 6:00 PM</p>
+            <p>📧 <strong>Email:</strong> jeptiah.services@email.com</p>
+        </div>
+
+    </div>
+</section>
+    </header>
+    
+    <section id="faq" class="section-padding" style="background: #1a222f;">
+    <h2 data-en="Frequently Asked Questions" data-bm="Soalan Lazim">Frequently Asked Questions</h2>
+    <div style="max-width: 700px; margin: 0 auto;">
+
+        <div class="faq-item">
+            <h4 data-en="How long does a basic service take?" data-bm="Berapa lama servis biasa diambil?">
+                How long does a basic service take?
+            </h4>
+            <p data-en="Standard oil change and inspection usually takes 45-60 minutes." 
+               data-bm="Tukar minyak hitam dan pemeriksaan biasa biasanya mengambil masa 45-60 minit.">
+               Standard oil change and inspection usually takes 45-60 minutes.
+            </p>
+        </div>
+
+        <div class="faq-item">
+            <h4 data-en="Do you provide a warranty for repairs?" data-bm="Adakah anda menyediakan waranti untuk pembaikan?">
+                Do you provide a warranty for repairs?
+            </h4>
+            <p data-en="Yes, we provide a 3 to 6 month warranty on most parts and labor." 
+               data-bm="Ya, kami menyediakan waranti 3 hingga 6 bulan untuk kebanyakan alat ganti dan upah.">
+               Yes, we provide a 3 to 6 month warranty on most parts and labor.
+            </p>
+        </div>
+
+        <div class="faq-item">
+            <h4 data-en="Can I bring my own engine oil?" data-bm="Bolehkah saya bawa minyak Hitam / Enjen sendiri?">
+                Can I bring my own engine oil?
+            </h4>
+            <p data-en="Yes, we can perform the service with your parts, charging only for labor." 
+               data-bm="Mesti lah Boleh, kami boleh lakukan servis dengan alat ganti yang anda telah beli, hanya caj pada upah sahaja.">
+               Yes, we can perform the service with your parts, charging only for labor.
+            </p>
+        </div>
+
+    </div>
+</section>
+
+    <footer style="text-align: center; padding: 20px; color: #666; font-size: 0.8rem;">
+        &copy; 2026 JT auto Services. All rights reserved.
+    </footer>
+
+    <a href="https://wa.me/+60165250890" class="whatsapp-float" target="_blank">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
+    <span data-en="Chat with us" data-bm="Hubungi kami">Chat with us</span>
+</a>
+
+<a href="tel:+60165250890" class="towing-float">
+    <span class="towing-icon">🚨</span>
+    <span data-en="Emergency Towing" data-bm="Trak Tunda Kecemasan">Emergency Towing</span>
+</a>
+
+<script>
+function setLanguage(lang) {
+    const elements = document.querySelectorAll('[data-en]');
+    elements.forEach(el => {
+        const text = el.getAttribute('data-' + lang);
+        if (text) {
+            // Check if it's an input/placeholder or standard text
+            if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                el.placeholder = text;
+            } else {
+                el.innerText = text;
+            }
+        }
+    });
+    localStorage.setItem('preferredLang', lang);
+}
+
+window.onload = () => {
+    const savedLang = localStorage.getItem('preferredLang') || 'en';
+    setLanguage(savedLang);
+};
+</script>
+
+</body>
+</html>
