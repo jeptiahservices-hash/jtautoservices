@@ -120,14 +120,50 @@
             border-top: 3px solid var(--primary-color); z-index: 2000;
         }
         .checkout-btn { background: #25d366; color: white; padding: 12px 25px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; }
+
+        .shopee-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ee4d2d; /* Shopee's official orange */
+    color: white !important;
+    padding: 12px 20px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1rem;
+    margin-top: 20px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.shopee-btn:hover {
+    background-color: #ff5722;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.shopee-btn:active {
+    transform: translateY(0);
+}
+        @keyframes pulse-orange {
+    0% { box-shadow: 0 0 0 0 rgba(238, 77, 45, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(238, 77, 45, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(238, 77, 45, 0); }
+}
+
+.shopee-btn {
+    animation: pulse-orange 2s infinite;
+}
     </style>
 </head>
 <body>
 
     <header>
         <div class="logo-container">
-            <img src="logo.png" alt="Logo" onerror="this.style.display='none'">
-            <span class="logo-text">JTS <span style="color:var(--primary-color)">Market</span></span>
+            <img src="assets/logo.png" alt="Logo" onerror="this.style.display='none'">
+            <span class="logo-text">Mar<span style="color:var(--primary-color)">ket</span></span>
         </div>
         <div class="nav-right">
             <div class="lang-switch">
@@ -237,7 +273,10 @@
                 </div>
                 <p style="font-size:0.9rem;">${item.desc_en}</p>
                 <p style="font-size:0.8rem; color:#9ca3af;">${item.desc_bm}</p>
-                <a href="${item.shopee_link}" target="_blank" class="shopee-btn">🛒 View on Shopee</a>
+                <a href="${item.shopee_link}" target="_blank" class="shopee-btn">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/f/fe/Shopee.svg" alt="Shopee Icon" style="width:18px; height:18px; margin-right:8px;">
+    Buy on Shopee
+</a>
             `;
             document.getElementById('productModal').style.display = "block";
         }
