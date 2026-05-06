@@ -1,6 +1,7 @@
 const serviceRecords = {
     "JXB2663": {
         customerName: "Jaefri Fathiah",
+        cardetails: "Proton S70 (White)",
         carImage: "img_car/mycar_jxb2663.jpg",
         lastService: "2026-04-15",
         mileage: "85,000 km",
@@ -12,6 +13,7 @@ const serviceRecords = {
 
     "ABC1234": {
         customerName: "Fathiah",
+        cardetails: "Proton Persona (Black)",
         carImage: "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?q=80&w=600",
         lastService: "2026-05-01",
         mileage: "120,000 km",
@@ -23,6 +25,7 @@ const serviceRecords = {
 
     "ABC1223": {
         customerName: "tiah",
+        cardetails: "Proton Wira (Red)",
         carImage: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?q=80&w=600",
         lastService: "20265-05-01",
         mileage: "120,000 km",
