@@ -21,7 +21,7 @@ const serviceRecords = {
         nextService: "2026-11-01"
     },
 
-    "ABC1234": {
+    "ABC1223": {
         customerName: "tiah",
         carImage: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?q=80&w=600",
         lastService: "20265-05-01",
