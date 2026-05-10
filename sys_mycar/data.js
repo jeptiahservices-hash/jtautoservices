@@ -33,5 +33,29 @@ const serviceRecords = {
         details: "Customer Request Replacing Radiator. Include Radiator Coolant.",
         driveLink: "https://drive.google.com/file/d/1kSdyNS4xTaILozT6e0G8CpFHBWW4reKk/view?usp=sharing",
         nextService: "2026-00-00"
+    },
+
+    "WYQ7521": {
+        customerName: "En. Fitri",
+        cardetails: "Toyota Vios (White)",
+        carImage: "img_car/mycar_wyq7521.jpeg",
+        lastService: "2026-05-010",
+        mileage: "179,500 km",
+        partsChanged: ["Engine Oil", "Automatin Transmition Fluid", "Oil Filter"],
+        details: "Next Change: Engine Oil- 184500km or 10/10/2026. ATF- 199500km or 10/05/2027.",
+        driveLink: "https://drive.google.com/file/d/1yqtN3_fSQeR8koprIQ32C6i0kWqx8wD3/view?usp=drive_link",
+        nextService: "2026-10-10"
+    },
+
+    "VDA8026": {
+        customerName: "En. Farhan",
+        cardetails: "Proton Saga (White)",
+        carImage: "img_car/mycar_vda8026.jpeg",
+        lastService: "2026-05-009",
+        mileage: "000,000 km",
+        partsChanged: ["Brake Pand", "Brake Fluid", "Skims Disk Rotor"],
+        details: "Brakepad Habis dan Makan Rotor Disk. Service Brake Belakang Dan Flush Brake Fluid",
+        driveLink: "https://drive.google.com/file/d/1KjkJUjyomBAw9bhgGfWyAlisMCL-Llu9/view?usp=drive_link",
+        nextService: "2026-00-00, Perlu Tukar Engine Mounting Dan Drive Shaft"
     }
 };
