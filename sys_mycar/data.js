@@ -41,7 +41,7 @@ const serviceRecords = {
         carImage: "img_car/mycar_wyq7521.jpeg",
         lastService: "2026-05-010",
         mileage: "179,500 km",
-        partsChanged: ["Engine Oil", "Automatin Transmition Fluid", "Oil Filter"],
+        partsChanged: ["Engine Oil", "Automatic Trans Fluid", "Oil Filter"],
         details: "Next Change: Engine Oil- 184500km or 10/10/2026. ATF- 199500km or 10/05/2027.",
         driveLink: "https://drive.google.com/file/d/1yqtN3_fSQeR8koprIQ32C6i0kWqx8wD3/view?usp=drive_link",
         nextService: "2026-10-10"
