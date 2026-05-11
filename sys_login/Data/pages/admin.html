@@ -29,6 +29,7 @@
         
         <label>Brand & Names</label>
         <input type="text" id="p-brand" placeholder="Brand (e.g., Shell)">
+        <input type="text" id="p-badge" placeholder="Bagde (e.g., S70)">
         <input type="text" id="p-name-en" placeholder="Product Name (English)">
         <input type="text" id="p-name-bm" placeholder="Product Name (Malay)">
         
@@ -108,7 +109,7 @@
                 category: document.getElementById('p-category').value,
                 main_img: document.getElementById('p-img').value,
                 desc_en: document.getElementById('p-desc').value,
-                badge: "Genuine",
+                badge: document.getElementById('p-badge').value,
                 gallery: [document.getElementById('p-img').value] 
             };
 
@@ -144,6 +145,7 @@
                 if(p) {
                     document.getElementById('p-id').value = p.id;
                     document.getElementById('p-brand').value = p.brand || "";
+                    document.getElementById('p-badge').value = p.badge || "";
                     document.getElementById('p-name-en').value = p.name_en || "";
                     document.getElementById('p-name-bm').value = p.name_bm || "";
                     document.getElementById('p-price').value = p.price || 0;
