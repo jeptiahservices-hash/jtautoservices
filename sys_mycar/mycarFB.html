@@ -3,31 +3,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Service Record Search</title>
-    <!-- Paste your CSS here or keep it in the <style> tag you had before -->
+    <title>JT Auto Services | Comprehensive Report</title>
     <style>
-        /* (Keep your existing CSS here) */
-        #reportResult { margin-top: 20px; display: none; }
-        .report-card { background: #161b22; border-radius: 12px; padding: 20px; border: 1px solid #30363d; }
-        .car-photo { width: 100%; border-radius: 8px; margin-bottom: 15px; }
-        .section-title { color: #58a6ff; font-weight: bold; display: block; margin-top: 15px; }
-        .pdf-btn { display: inline-block; background: #238636; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; margin-top: 10px; }
+        :root {
+            --bg-color: #0b0e14;
+            --card-bg: #161b22;
+            --accent-blue: #58a6ff;
+            --text-main: #c9d1d9;
+            --text-dim: #8b949e;
+            --success: #2ea44f;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .company-logo {
+            width: 220px;
+            height: auto;
+            margin-bottom: 1.5rem;
+        }
+
+        .logo { font-size: 1.8rem; font-weight: bold; color: var(--accent-blue); margin-bottom: 20px; text-align: center; }
+
+        .search-container {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            border: 1px solid #30363d;
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 65%;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #30363d;
+            background: #0d1117;
+            color: #fff;
+            text-transform: uppercase;
+            font-size: 1rem;
+        }
+
+        button {
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: opacity 0.2s;
+        }
+
+        button:hover { opacity: 0.8; }
+
+        #reportResult { width: 100%; max-width: 700px; display: none; margin-bottom: 50px; }
+
+        .report-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #30363d;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .car-photo {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            border-bottom: 4px solid var(--accent-blue);
+        }
+
+        .content { padding: 25px; }
+
+        .section-title {
+            color: var(--accent-blue);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 20px;
+            display: block;
+            font-weight: bold;
+            border-bottom: 1px solid #30363d;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+
+        .parts-list {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0;
+        }
+
+        .parts-list li {
+            background: #0d1117;
+            margin-bottom: 5px;
+            padding: 10px 15px;
+            border-radius: 4px;
+            font-size: 0.95rem;
+            border-left: 4px solid var(--success);
+        }
+
+        .pdf-btn {
+            display: block;
+            margin-top: 25px;
+            background: var(--success);
+            color: white;
+            text-decoration: none;
+            padding: 15px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .status-msg { margin-top: 20px; font-style: italic; color: var(--text-dim); }
     </style>
 </head>
 <body>
+    
+    <img src="logo.png" alt="JT Auto" class="company-logo" onerror="this.style.display='none'">
+    <div class="logo">MyCar <span style="color:var(--text-main); font-weight: normal; font-size: 1.2rem;">-Aftersales Service-</span></div>
 
-    <!-- IMPORTANT: These IDs must exist for the script to work! -->
-    <div style="text-align: center; padding: 20px;">
-        <input type="text" id="regInput" placeholder="ENTER PLATE NUMBER" style="padding: 10px; width: 250px;">
-        <button id="searchBtn" style="padding: 10px 20px; cursor: pointer;">SEARCH RECORDS</button>
+    <div class="search-container">
+        <input type="text" id="regInput" placeholder="PLATE NUMBER">
+        <button onclick="checkService()">SEARCH</button>
     </div>
 
-    <div id="reportResult"></div>
+    <div id="reportResult">
+        <!-- Result will be injected here -->
+    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
+        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyAOkSn53iUrBiHO-5wS1t4vcJwW46yAoqs",
             authDomain: "jtautoservices-metadata.firebaseapp.com",
@@ -41,68 +164,75 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Link the button click to our function
-        document.getElementById('searchBtn').addEventListener('click', () => {
-            checkService();
-        });
-
-        async function checkService() {
+        // This makes the function accessible to the HTML button
+        window.checkService = async function() {
             const input = document.getElementById('regInput').value.trim().toUpperCase();
             const resultDiv = document.getElementById('reportResult');
             
             if (!input) return alert("Please enter a plate number");
 
-            resultDiv.innerHTML = "<p style='text-align:center;'>Searching...</p>";
             resultDiv.style.display = 'block';
+            resultDiv.innerHTML = "<p class='status-msg'>Searching secure records...</p>";
 
-            const dbRef = ref(db);
             try {
-                const snapshot = await get(child(dbRef, `serviceRecords/${input}`));
-                
+                const recordRef = ref(db, `serviceRecords/${input}`);
+                const snapshot = await get(recordRef);
+
                 if (snapshot.exists()) {
                     const data = snapshot.val();
                     
+                    // Build Parts List
                     let partsHTML = '';
                     if (data.partsChanged && Array.isArray(data.partsChanged)) {
                         partsHTML = data.partsChanged.map(item => `<li>${item}</li>`).join('');
                     } else {
-                        partsHTML = '<li>No parts listed.</li>';
+                        partsHTML = '<li>Generic Service Maintenance</li>';
                     }
 
                     resultDiv.innerHTML = `
                         <div class="report-card">
-                            <img src="${data.carImage || 'https://via.placeholder.com/600x250?text=No+Photo'}" class="car-photo" alt="Car Photo">
+                            <img src="${data.carImage || 'https://via.placeholder.com/600x300?text=No+Photo+Available'}" class="car-photo" alt="Car Photo">
                             <div class="content">
-                                <h2 style="margin:0; color:white;">${input}</h2>
-                                <p style="color:#8b949e">Customer: ${data.customerName || 'N/A'}</p>
-                                <p style="color:#8b949e">Model: ${data.cardetails || 'N/A'}</p>
+                                <h2 style="margin:0; color:var(--accent-blue);">${input}</h2>
+                                <p style="margin: 5px 0; font-weight: bold;">Owner: ${data.customerName || 'Private'}</p>
+                                <p style="color:var(--text-dim); margin: 0;">Vehicle: ${data.cardetails || 'N/A'}</p>
                                 
-                                <span class="section-title">Summary</span>
-                                <p><strong>Date:</strong> ${data.lastService || 'N/A'} | <strong>Mileage:</strong> ${data.mileage || 'N/A'}</p>
-                                
-                                <span class="section-title">Items Replaced</span>
-                                <ul class="parts-list" style="color:#c9d1d9;">${partsHTML}</ul>
-
-                                <span class="section-title">Additional Remarks</span>
-                                <p>${data.details || 'None.'}</p>
-
-                                <a href="${data.driveLink || '#'}" target="_blank" class="pdf-btn">📄 View Full PDF Invoice</a>
-                                
-                                <p style="margin-top:20px; color:#ffca28; font-size:0.9rem; font-weight:bold;">
-                                    Next Service: ${data.nextService || 'Contact JTS'}
+                                <span class="section-title">Service History</span>
+                                <p style="margin: 5px 0;">
+                                    <strong>Last Visit:</strong> ${data.lastService || 'N/A'} <br>
+                                    <strong>Mileage:</strong> ${data.mileage || 'N/A'}
                                 </p>
+                                
+                                <span class="section-title">Work Done / Parts Replaced</span>
+                                <ul class="parts-list">${partsHTML}</ul>
+
+                                <span class="section-title">Technician Remarks</span>
+                                <p style="font-size: 0.95rem; line-height: 1.6;">${data.details || 'No additional remarks recorded.'}</p>
+
+                                ${data.driveLink ? `
+                                    <a href="${data.driveLink}" target="_blank" class="pdf-btn">
+                                        📄 DOWNLOAD PDF INVOICE
+                                    </a>
+                                ` : ''}
+                                
+                                <div style="margin-top:25px; background: rgba(251, 191, 36, 0.1); padding: 15px; border-radius: 8px; border: 1px solid rgba(251, 191, 36, 0.3);">
+                                    <p style="margin:0; color:#fbbf24; font-size:0.95rem; font-weight:bold; text-align:center;">
+                                        ⚠️ NEXT SUGGESTED SERVICE: ${data.nextService || 'Contact Workshop'}
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     `;
                 } else {
+                    resultDiv.innerHTML = "";
                     resultDiv.style.display = 'none';
-                    alert("No record found for: " + input);
+                    alert("No record found for " + input + ". Please verify the plate number.");
                 }
             } catch (error) {
                 console.error(error);
-                alert("Error fetching records. Check console for details.");
+                alert("Connection error. Please try again.");
             }
-        }
+        };
     </script>
 </body>
 </html>
