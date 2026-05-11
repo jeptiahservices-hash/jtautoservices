@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>JTS Admin | Manage Inventory</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #111827; color: white; padding: 20px; }
+        .form-group { background: #1f2937; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #374151; }
+        h2 { color: #2563eb; }
+        input, select, textarea { width: 100%; padding: 10px; margin: 5px 0 15px 0; border-radius: 4px; border: 1px solid #374151; background: #111827; color: white; box-sizing: border-box; }
+        button { background: #2563eb; color: white; padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; }
+        button:hover { background: #1d4ed8; }
+        .delete-btn { background: #ef4444; width: auto; padding: 5px 10px; }
+        .delete-btn:hover { background: #dc2626; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #1f2937; }
+        th, td { border: 1px solid #374151; padding: 12px; text-align: left; }
+        th { background: #111827; }
+        .edit-link { color: #fbbf24; cursor: pointer; text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <h2>📦 Inventory Manager</h2>
+    <div class="form-group" id="product-form">
+        <label>Unique ID (Cannot change for existing items)</label>
+        <input type="text" id="p-id" placeholder="e.g., shell-hx7-5w40">
+        
+        <label>Brand & Names</label>
+        <input type="text" id="p-brand" placeholder="Brand (e.g., Shell)">
+        <input type="text" id="p-name-en" placeholder="Product Name (English)">
+        <input type="text" id="p-name-bm" placeholder="Product Name (Malay)">
+        
+        <label>Pricing & Category</label>
+        <input type="number" id="p-price" placeholder="Price (RM)">
+        <select id="p-category">
+            <option value="oil-section">🛢️ Engine Oil</option>
+            <option value="filter-section">🌪️ Oil Filters</option>
+            <option value="bulb-section">💡 Bulbs & Lights</option>
+        </select>
+        
+        <label>Images & Info</label>
+        <input type="text" id="p-img" placeholder="Main Image URL (Paste link here)">
+        <textarea id="p-desc" placeholder="Product Description (Details/Fitment)"></textarea>
+        
+        <button onclick="uploadToFirebase()">🚀 Sync to Live Market</button>
+    </div>
+
+    <h2>📋 Live Inventory List</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Product Details (Click to Edit)</th>
+                <th>Price</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="inventory-list"></tbody>
+    </table>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        // Your Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyAOkSn53iUrBiHO-5wS1t4vcJwW46yAoqs",
+            authDomain: "jtautoservices-metadata.firebaseapp.com",
+            databaseURL: "https://jtautoservices-metadata-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "jtautoservices-metadata",
+            storageBucket: "jtautoservices-metadata.firebasestorage.app",
+            messagingSenderId: "426427161628",
+            appId: "1:426427161628:web:22a0f220400cfc5c1a93d9"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // SAVE OR UPDATE FUNCTION
+        window.uploadToFirebase = function() {
+            const id = document.getElementById('p-id').value.trim();
+            if(!id) return alert("Please enter a Unique ID");
+
+            const productData = {
+                id: id,
+                brand: document.getElementById('p-brand').value,
+                name_en: document.getElementById('p-name-en').value,
+                name_bm: document.getElementById('p-name-bm').value,
+                price: parseFloat(document.getElementById('p-price').value) || 0,
+                category: document.getElementById('p-category').value,
+                main_img: document.getElementById('p-img').value,
+                desc_en: document.getElementById('p-desc').value,
+                badge: "Genuine",
+                gallery: [document.getElementById('p-img').value] 
+            };
+
+            set(ref(db, 'products/' + id), productData)
+                .then(() => {
+                    alert("✅ Market Updated!");
+                    // Optional: Clear form
+                    // document.querySelectorAll('input, textarea').forEach(i => i.value = "");
+                })
+                .catch((err) => alert("❌ Error: " + err));
+        }
+
+        // LOAD DATA INTO TABLE
+        const inventoryBody = document.getElementById('inventory-list');
+        onValue(ref(db, 'products'), (snapshot) => {
+            const data = snapshot.val();
+            inventoryBody.innerHTML = "";
+            
+            if (!data) {
+                inventoryBody.innerHTML = "<tr><td colspan='4'>No products found.</td></tr>";
+                return;
+            }
+
+            for(let id in data) {
+                const p = data[id];
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><code>${p.id}</code></td>
+                    <td><span class="edit-link" onclick="editProduct('${id}')">${p.brand} - ${p.name_en}</span></td>
+                    <td>RM ${p.price.toFixed(2)}</td>
+                    <td><button class="delete-btn" onclick="removeProduct('${id}')">🗑️ Remove</button></td>
+                `;
+                inventoryBody.appendChild(row);
+            }
+        });
+
+        // EDIT FUNCTION (Fills the form)
+        window.editProduct = function(id) {
+            onValue(ref(db, 'products/' + id), (snapshot) => {
+                const p = snapshot.val();
+                if(p) {
+                    document.getElementById('p-id').value = p.id;
+                    document.getElementById('p-brand').value = p.brand || "";
+                    document.getElementById('p-name-en').value = p.name_en || "";
+                    document.getElementById('p-name-bm').value = p.name_bm || "";
+                    document.getElementById('p-price').value = p.price || 0;
+                    document.getElementById('p-category').value = p.category;
+                    document.getElementById('p-img').value = p.main_img || "";
+                    document.getElementById('p-desc').value = p.desc_en || "";
+                    window.scrollTo(0,0); // Scroll to top to see the form
+                }
+            }, { onlyOnce: true });
+        }
+
+        // DELETE FUNCTION
+        window.removeProduct = function(id) {
+            if(confirm("Permanently remove this item from the shop?")) {
+                remove(ref(db, 'products/' + id));
+            }
+        }
+    </script>
+</body>
+</html>
