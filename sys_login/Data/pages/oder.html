@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>JTS | Order Manager</title>
+    <style>
+        body { font-family: sans-serif; background: #0f172a; color: white; padding: 20px; }
+        .order-card { background: #1e293b; padding: 15px; border-radius: 10px; margin-bottom: 15px; border-left: 5px solid #2563eb; }
+        .status-new { color: #fbbf24; font-weight: bold; }
+        .order-time { font-size: 0.8rem; color: #9ca3af; }
+    </style>
+</head>
+<body>
+    <h2>📋 Customer Orders</h2>
+    <div id="orders-container">Loading orders...</div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = { /* PASTE YOUR CONFIG HERE */ };
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        onValue(ref(db, 'orders'), (snapshot) => {
+            const data = snapshot.val();
+            const container = document.getElementById('orders-container');
+            container.innerHTML = "";
+
+            for (let id in data) {
+                const order = data[id];
+                const date = new Date(order.timestamp).toLocaleString();
+                
+                let itemsHtml = "";
+                for (let itemId in order.items) {
+                    itemsHtml += `<li>${order.items[itemId].name} (x${order.items[itemId].qty})</li>`;
+                }
+
+                container.innerHTML += `
+                    <div class="order-card">
+                        <div class="order-time">${date}</div>
+                        <p class="status-new">Status: ${order.status}</p>
+                        <ul>${itemsHtml}</ul>
+                        <div style="font-weight:bold; font-size:1.1rem;">Total: RM ${order.totalAmount}</div>
+                    </div>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>
