@@ -1,72 +1,172 @@
-<script type="module">
-    // 1. ALL IMPORTS FIRST
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-    // 2. CONFIGURATION
-    const firebaseConfig = {
-        apiKey: "AIzaSyAOkSn53iUrBiHO-5wS1t4vcJwW46yAoqs",
-        authDomain: "jtautoservices-metadata.firebaseapp.com",
-        databaseURL: "https://jtautoservices-metadata-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "jtautoservices-metadata",
-        storageBucket: "jtautoservices-metadata.firebasestorage.app",
-        messagingSenderId: "426427161628",
-        appId: "1:426427161628:web:22a0f220400cfc5c1a93d9"
-    };
-
-    // 3. INITIALIZE SERVICES
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const auth = getAuth(app);
-
-    // 4. SECURITY CHECK (Runs immediately)
-    onAuthStateChanged(auth, (user) => {
-        if (!user) {
-            alert("Access Denied. Please login first.");
-            window.location.href = "login.html"; 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JTS Admin | Service Entry</title>
+    <style>
+        :root {
+            --bg: #0b0e14;
+            --card: #161b22;
+            --accent: #58a6ff;
+            --text: #c9d1d9;
+            --success: #238636;
         }
-    });
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .form-card { background: var(--card); padding: 25px; border-radius: 12px; width: 100%; max-width: 600px; border: 1px solid #30363d; }
+        h2 { color: var(--accent); margin-top: 0; }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; font-size: 0.85rem; margin-bottom: 5px; color: #8b949e; }
+        input, textarea { width: 100%; padding: 10px; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: white; box-sizing: border-box; }
+        .parts-container { background: #0d1117; padding: 10px; border-radius: 6px; border: 1px solid #30363d; }
+        .part-row { display: flex; gap: 5px; margin-bottom: 5px; }
+        .btn { background: var(--accent); color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
+        .btn-add { background: #30363d; font-size: 0.8rem; width: auto; padding: 5px 10px; }
+        .btn-save { background: var(--success); font-size: 1.1rem; margin-top: 25px; }
+        .nav-links { margin-top: 20px; }
+        .nav-links a { color: var(--accent); text-decoration: none; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
 
-    // 5. FUNCTIONS (Global window binding)
-    window.addPartRow = function() {
-        const container = document.getElementById('partsList');
-        const div = document.createElement('div');
-        div.className = 'part-row';
-        div.innerHTML = '<input type="text" class="part-item" placeholder="e.g. Oil Filter">';
-        container.appendChild(div);
-    }
+    <div class="form-card">
+        <h2>🚗 New Service Record</h2>
+        
+        <div class="input-group">
+            <label>Plate Number (e.g. WVG1234)</label>
+            <input type="text" id="plate" placeholder="ENTER PLATE" style="text-transform: uppercase;">
+        </div>
 
-    window.saveRecord = function() {
-        const plate = document.getElementById('plate').value.trim().toUpperCase();
-        if(!plate) return alert("Plate number is required!");
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div class="input-group">
+                <label>Customer Name</label>
+                <input type="text" id="custName">
+            </div>
+            <div class="input-group">
+                <label>Car Model</label>
+                <input type="text" id="carModel">
+            </div>
+        </div>
 
-        const parts = [];
-        document.querySelectorAll('.part-item').forEach(input => {
-            if(input.value.trim()) parts.push(input.value.trim());
-        });
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div class="input-group">
+                <label>Service Date</label>
+                <input type="date" id="serviceDate">
+            </div>
+            <div class="input-group">
+                <label>Mileage (KM)</label>
+                <input type="text" id="mileage">
+            </div>
+        </div>
 
-        const recordData = {
-            customerName: document.getElementById('custName').value,
-            cardetails: document.getElementById('carModel').value,
-            lastService: document.getElementById('serviceDate').value,
-            mileage: document.getElementById('mileage').value,
-            carImage: document.getElementById('imgUrl').value,
-            driveLink: document.getElementById('pdfUrl').value,
-            details: document.getElementById('remarks').value,
-            nextService: document.getElementById('nextService').value,
-            partsChanged: parts,
-            updatedAt: new Date().toISOString() // Added this to track when you saved it
+        <div class="input-group">
+            <label>Items Replaced</label>
+            <div id="partsList" class="parts-container">
+                <div class="part-row"><input type="text" class="part-item" placeholder="e.g. Engine Oil 5W30"></div>
+            </div>
+            <button class="btn btn-add" type="button" onclick="addPartRow()">+ Add Another Item</button>
+        </div>
+
+        <div class="input-group">
+            <label>Car Photo URL</label>
+            <input type="text" id="imgUrl" placeholder="Link to image">
+        </div>
+
+        <div class="input-group">
+            <label>PDF Invoice URL</label>
+            <input type="text" id="pdfUrl" placeholder="Link to PDF">
+        </div>
+
+        <div class="input-group">
+            <label>Additional Remarks</label>
+            <textarea id="remarks" rows="3"></textarea>
+        </div>
+
+        <div class="input-group">
+            <label>Next Service Suggestion</label>
+            <input type="text" id="nextService" placeholder="e.g. Nov 2024 or 90,000 KM">
+        </div>
+
+        <button class="btn btn-save" type="button" onclick="saveRecord()">🚀 Save to Firebase</button>
+    </div>
+
+    <div class="nav-links">
+        <a href="index.html">← Back to Shop</a>
+    </div>
+
+    <script type="module">
+        // 1. All Imports at the very top
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        // 2. Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyAOkSn53iUrBiHO-5wS1t4vcJwW46yAoqs",
+            authDomain: "jtautoservices-metadata.firebaseapp.com",
+            databaseURL: "https://jtautoservices-metadata-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "jtautoservices-metadata",
+            storageBucket: "jtautoservices-metadata.firebasestorage.app",
+            messagingSenderId: "426427161628",
+            appId: "1:426427161628:web:22a0f220400cfc5c1a93d9"
         };
 
-        set(ref(db, 'serviceRecords/' + plate), recordData)
-            .then(() => {
-                alert("✅ Record Saved Successfully for " + plate);
-                location.reload(); 
-            })
-            .catch(err => {
-                console.error(err);
-                alert("❌ Error: " + err.message);
+        // 3. Initialize
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const auth = getAuth(app);
+
+        // 4. Security Observer
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                console.log("Not logged in, redirecting...");
+                window.location.href = "login.html"; 
+            } else {
+                console.log("Logged in as:", user.email);
+            }
+        });
+
+        // 5. Global Functions
+        window.addPartRow = function() {
+            const container = document.getElementById('partsList');
+            const div = document.createElement('div');
+            div.className = 'part-row';
+            div.innerHTML = '<input type="text" class="part-item" placeholder="e.g. Oil Filter">';
+            container.appendChild(div);
+        };
+
+        window.saveRecord = function() {
+            const plate = document.getElementById('plate').value.trim().toUpperCase();
+            if(!plate) return alert("Plate number is required!");
+
+            const parts = [];
+            document.querySelectorAll('.part-item').forEach(input => {
+                if(input.value.trim()) parts.push(input.value.trim());
             });
-    }
-</script>
+
+            const recordData = {
+                customerName: document.getElementById('custName').value,
+                cardetails: document.getElementById('carModel').value,
+                lastService: document.getElementById('serviceDate').value,
+                mileage: document.getElementById('mileage').value,
+                carImage: document.getElementById('imgUrl').value,
+                driveLink: document.getElementById('pdfUrl').value,
+                details: document.getElementById('remarks').value,
+                nextService: document.getElementById('nextService').value,
+                partsChanged: parts,
+                timestamp: new Date().toISOString()
+            };
+
+            set(ref(db, 'serviceRecords/' + plate), recordData)
+                .then(() => {
+                    alert("✅ Record Saved Successfully for " + plate);
+                    location.reload(); 
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("❌ Error: " + err.message);
+                });
+        };
+    </script>
+</body>
+</html>
