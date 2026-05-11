@@ -253,7 +253,7 @@
 
     <section class="hero">
         <h1 data-en="Shop Parts" data-bm="Kedai Alat Ganti">Shop Parts</h1>
-        <p data-en="Select items and checkout via WhatsApp" data-bm="Pilih barang dan pesan melalui WhatsApp">Select items and checkout via WhatsApp</p>
+        <p data-en="Select items and checkout via WhatsApp" data-bm="Pilih barang dan pesan melalui WhatsApp">Select items and checkout</p>
     </section>
 
     <div class="search-container">
@@ -306,7 +306,7 @@
                 <span>Total:</span>
                 <span>RM <span id="cart-total">0.00</span></span>
             </div>
-            <button class="checkout-btn" onclick="sendToWhatsApp()" style="width:100%;">Confirm & Order via WhatsApp</button>
+            <button class="checkout-btn" onclick="sendToWhatsApp()" style="width:100%;">Confirm & Order</button>
             <button onclick="clearBasket()" style="background:none; border:none; color:#9ca3af; width:100%; margin-top:10px; text-decoration:underline; cursor:pointer;">Clear All</button>
         </div>
     </div>
@@ -315,7 +315,7 @@
     <!-- 1. Firebase SDKs -->
     <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { getDatabase, ref, onValue, push } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
     // 1. Firebase Configuration
     const firebaseConfig = {
@@ -470,17 +470,42 @@
 
     // --- WHATSAPP ORDER ---
     window.sendToWhatsApp = function() {
-        let total = document.getElementById('cart-total').innerText;
-        if (total === "0.00") return alert("Your basket is empty!");
-        
-        let msg = "*🛒 NEW ORDER - JTS MARKET*%0A--------------------------%0A";
-        for (let id in window.basket) {
-            const item = window.basket[id];
-            msg += `• ${item.name} (x${item.qty}) - RM ${(item.qty * item.price).toFixed(2)}%0A`;
-        }
-        msg += `--------------------------%0A*TOTAL: RM ${total}*`;
-        window.open(`https://wa.me/60165250890?text=${msg}`, '_blank');
+    let total = document.getElementById('cart-total').innerText;
+    if (total === "0.00") return alert("Your basket is empty!");
+
+    // 1. Prepare the order data for Firebase
+    const orderData = {
+        timestamp: new Date().toISOString(),
+        items: window.basket,
+        totalAmount: total,
+        status: "New"
     };
+
+    // 2. Save to Firebase first
+    const ordersRef = ref(db, 'orders');
+    push(ordersRef, orderData)
+        .then(() => {
+            // 3. Once saved, prepare and send the WhatsApp message
+            let msg = "*🛒 NEW ORDER SAVED*%0A--------------------------%0A";
+            for (let id in window.basket) {
+                const item = window.basket[id];
+                msg += `• ${item.name} (x${item.qty}) - RM ${(item.qty * item.price).toFixed(2)}%0A`;
+            }
+            msg += `--------------------------%0A*TOTAL: RM ${total}*%0A%0A_Order recorded in JTS System._`;
+            
+            window.open(`https://wa.me/60165250890?text=${msg}`, '_blank');
+
+            // 4. Clear the basket and close modal
+            window.basket = {};
+            window.updateBasketUI();
+            window.toggleBasket();
+            alert("Order placed successfully!");
+        })
+        .catch((err) => {
+            console.error(err);
+            alert("System error. Please try ordering directly via WhatsApp.");
+        });
+};
 
     // --- EXISTING MODAL & SEARCH ---
     window.openPopup = function(id) {
@@ -493,6 +518,9 @@
             <button onclick="addToCart('${item.id}'); closePopup();" style="background:#25d366; color:white; border:none; padding:12px; width:100%; border-radius:8px; font-weight:bold; cursor:pointer;">
                 Add to Basket & Continue Shopping
             </button>
+            <h2 style="color:var(--primary-color);">${item.name_en}</h2>
+<p style="font-weight:bold; font-size:1.2rem;">RM ${parseFloat(item.price).toFixed(2)}</p> 
+<div class="modal-gallery">...</div>
         `;
         document.getElementById('productModal').style.display = "block";
     };
