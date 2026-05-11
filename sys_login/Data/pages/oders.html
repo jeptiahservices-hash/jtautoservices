@@ -3,48 +3,85 @@
 <head>
     <title>JTS | Order Manager</title>
     <style>
-        body { font-family: sans-serif; background: #0f172a; color: white; padding: 20px; }
-        .order-card { background: #1e293b; padding: 15px; border-radius: 10px; margin-bottom: 15px; border-left: 5px solid #2563eb; }
-        .status-new { color: #fbbf24; font-weight: bold; }
-        .order-time { font-size: 0.8rem; color: #9ca3af; }
+        body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: white; padding: 20px; }
+        .order-card { background: #1e293b; padding: 20px; border-radius: 12px; margin-bottom: 20px; border-left: 6px solid #2563eb; position: relative; }
+        .status-new { background: #fbbf24; color: #000; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; }
+        .order-time { font-size: 0.85rem; color: #9ca3af; margin-bottom: 10px; }
+        .item-list { margin: 15px 0; padding-left: 20px; color: #e2e8f0; }
+        .total-price { font-size: 1.2rem; font-weight: bold; color: #60a5fa; }
+        .delete-btn { position: absolute; top: 20px; right: 20px; background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
+        .no-orders { text-align: center; color: #9ca3af; margin-top: 50px; }
     </style>
 </head>
 <body>
-    <h2>📋 Customer Orders</h2>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h2>📋 Customer Orders</h2>
+        <button onclick="location.reload()" style="background:#334155; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">Refresh List</button>
+    </div>
+
     <div id="orders-container">Loading orders...</div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        const firebaseConfig = { /* PASTE YOUR CONFIG HERE */ };
+        // IMPORTANT: Use your real config here
+        const firebaseConfig = {
+            apiKey: "AIzaSyAOkSn53iUrBiHO-5wS1t4vcJwW46yAoqs",
+            authDomain: "jtautoservices-metadata.firebaseapp.com",
+            databaseURL: "https://jtautoservices-metadata-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "jtautoservices-metadata",
+            storageBucket: "jtautoservices-metadata.firebasestorage.app",
+            messagingSenderId: "426427161628",
+            appId: "1:426427161628:web:22a0f220400cfc5c1a93d9"
+        };
+
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
+        // Listen for Orders
         onValue(ref(db, 'orders'), (snapshot) => {
             const data = snapshot.val();
             const container = document.getElementById('orders-container');
+            
+            if (!data) {
+                container.innerHTML = "<div class='no-orders'>No orders in the database.</div>";
+                return;
+            }
+
             container.innerHTML = "";
 
-            for (let id in data) {
+            // Convert object to array and sort by newest first
+            const orderIds = Object.keys(data).reverse();
+
+            orderIds.forEach(id => {
                 const order = data[id];
-                const date = new Date(order.timestamp).toLocaleString();
+                const date = new Date(order.timestamp).toLocaleString('en-MY');
                 
                 let itemsHtml = "";
-                for (let itemId in order.items) {
-                    itemsHtml += `<li>${order.items[itemId].name} (x${order.items[itemId].qty})</li>`;
+                for (let key in order.items) {
+                    const item = order.items[key];
+                    itemsHtml += `<li>${item.name} <strong>(x${item.qty})</strong></li>`;
                 }
 
                 container.innerHTML += `
                     <div class="order-card">
+                        <button class="delete-btn" onclick="deleteOrder('${id}')">🗑️ Delete</button>
                         <div class="order-time">${date}</div>
-                        <p class="status-new">Status: ${order.status}</p>
-                        <ul>${itemsHtml}</ul>
-                        <div style="font-weight:bold; font-size:1.1rem;">Total: RM ${order.totalAmount}</div>
+                        <span class="status-new">${order.status || 'NEW'}</span>
+                        <ul class="item-list">${itemsHtml}</ul>
+                        <div class="total-price">Total: RM ${order.totalAmount}</div>
                     </div>
                 `;
-            }
+            });
         });
+
+        // Delete Order Function
+        window.deleteOrder = function(id) {
+            if(confirm("Mark as finished and delete from list?")) {
+                remove(ref(db, 'orders/' + id));
+            }
+        };
     </script>
 </body>
 </html>
