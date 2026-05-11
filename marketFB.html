@@ -233,6 +233,11 @@
 .shopee-btn {
     animation: pulse-orange 2s infinite;
 }
+.shopee-btn img {
+    width: 20px;
+    height: 20px;
+    filter: brightness(0) invert(1); /* Makes the Shopee logo white to match your text */
+}
     </style>
 </head>
 <body>
@@ -308,6 +313,10 @@
             </div>
             <button class="checkout-btn" onclick="sendToWhatsApp()" style="width:100%;">Confirm & Order</button>
             <button onclick="clearBasket()" style="background:none; border:none; color:#9ca3af; width:100%; margin-top:10px; text-decoration:underline; cursor:pointer;">Clear All</button>
+            <div id="productModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closePopup()">&times;</span>
+        <div id="modalDetails">
         </div>
     </div>
 </div>
@@ -509,21 +518,45 @@
 
     // --- EXISTING MODAL & SEARCH ---
     window.openPopup = function(id) {
-        const item = window.allProducts.find(p => p.id === id);
-        const container = document.getElementById('modalDetails');
-        container.innerHTML = `
-            <h2 style="color:var(--primary-color);">${item.name_en}</h2>
-            <div class="modal-gallery"><img src="${item.main_img}" style="width:100%; border-radius:10px;"></div>
-            <p>${item.desc_en || ''}</p>
-            <button onclick="addToCart('${item.id}'); closePopup();" style="background:#25d366; color:white; border:none; padding:12px; width:100%; border-radius:8px; font-weight:bold; cursor:pointer;">
-                Add to Basket & Continue Shopping
-            </button>
-            <h2 style="color:var(--primary-color);">${item.name_en}</h2>
-<p style="font-weight:bold; font-size:1.2rem;">RM ${parseFloat(item.price).toFixed(2)}</p> 
-<div class="modal-gallery">...</div>
-        `;
-        document.getElementById('productModal').style.display = "block";
-    };
+    const item = window.allProducts.find(p => p.id === id);
+    if (!item) return;
+
+    const container = document.getElementById('modalDetails');
+    
+    // Safety check for gallery images
+    let galleryHtml = `<img src="${item.main_img}" style="width:100%; border-radius:10px; margin-bottom:10px;">`;
+    if (item.gallery && Array.isArray(item.gallery)) {
+        galleryHtml += `<div class="modal-gallery" style="display:flex; gap:10px; overflow-x:auto; padding-bottom:10px;">
+            ${item.gallery.map(img => `<img src="${img}" style="width:80px; height:80px; object-fit:cover; border-radius:5px; border:1px solid #444;">`).join('')}
+        </div>`;
+    }
+
+    container.innerHTML = `
+        <h2 style="color:var(--primary-color); margin-bottom:5px;">${item.name_en}</h2>
+        <p style="font-weight:bold; font-size:1.3rem; color:var(--accent-gold); margin-bottom:15px;">RM ${parseFloat(item.price).toFixed(2)}</p>
+        
+        <div id="popup-media">
+            ${galleryHtml}
+        </div>
+
+        <div style="margin: 15px 0;">
+            <p style="font-size:0.95rem; line-height:1.5;">${item.desc_en || 'No description available.'}</p>
+            <p style="font-size:0.85rem; color:#9ca3af; font-style:italic;">${item.desc_bm || ''}</p>
+        </div>
+
+        ${item.shopee_link ? `
+            <a href="${item.shopee_link}" target="_blank" class="shopee-btn">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/f/fe/Shopee.svg" alt="Shopee" style="width:18px; height:18px; margin-right:8px;">
+                View on Shopee
+            </a>` : ''}
+
+        <button onclick="addToCart('${item.id}'); closePopup();" style="background:#25d366; color:white; border:none; padding:15px; width:100%; border-radius:8px; font-weight:bold; cursor:pointer; margin-top:15px; font-size:1rem;">
+            🛒 Add to Basket & Continue Shopping
+        </button>
+    `;
+    
+    document.getElementById('productModal').style.display = "block";
+};
 
     window.closePopup = function() { document.getElementById('productModal').style.display = "none"; };
 
