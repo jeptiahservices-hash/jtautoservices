@@ -313,16 +313,22 @@
             </div>
             <button class="checkout-btn" onclick="sendToWhatsApp()" style="width:100%;">Confirm & Order</button>
             <button onclick="clearBasket()" style="background:none; border:none; color:#9ca3af; width:100%; margin-top:10px; text-decoration:underline; cursor:pointer;">Clear All</button>
-            <div id="productModal" class="modal">
+        </div> 
+    </div> 
+</div> <!-- This closes basketModal -->
+
+<!-- PRODUCT MODAL (Independent Layer) -->
+<div id="productModal" class="modal">
     <div class="modal-content">
         <span class="close-modal" onclick="closePopup()">&times;</span>
         <div id="modalDetails">
+            <!-- Content injected by JS -->
         </div>
     </div>
-</div>
+</div> <!-- This closes productModal -->
 
-    <!-- 1. Firebase SDKs -->
-    <script type="module">
+<!-- 1. Firebase SDKs -->
+<script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getDatabase, ref, onValue, push } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
