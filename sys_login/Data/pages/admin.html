@@ -15,13 +15,16 @@
         th, td { border: 1px solid #374151; padding: 12px; text-align: left; }
         th { background: #111827; }
         .edit-link { color: #fbbf24; cursor: pointer; text-decoration: underline; }
+        #auth-status { font-size: 0.8rem; color: #9ca3af; margin-bottom: 10px; text-align: right; }
     </style>
 </head>
 <body>
 
+    <div id="auth-status">Checking database access...</div>
     <h2>📦 Inventory Manager</h2>
+    
     <div class="form-group" id="product-form">
-        <label>Unique ID (Cannot change for existing items)</label>
+        <label>Unique ID</label>
         <input type="text" id="p-id" placeholder="e.g., shell-hx7-5w40">
         
         <label>Brand & Names</label>
@@ -38,8 +41,8 @@
         </select>
         
         <label>Images & Info</label>
-        <input type="text" id="p-img" placeholder="Main Image URL (Paste link here)">
-        <textarea id="p-desc" placeholder="Product Description (Details/Fitment)"></textarea>
+        <input type="text" id="p-img" placeholder="Main Image URL">
+        <textarea id="p-desc" placeholder="Product Description"></textarea>
         
         <button onclick="uploadToFirebase()">🚀 Sync to Live Market</button>
     </div>
@@ -58,10 +61,12 @@
     </table>
 
     <script type="module">
+        // 1. Import everything first
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // Your Config
+        // 2. Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyAOkSn53iUrBiHO-5wS1t4vcJwW46yAoqs",
             authDomain: "jtautoservices-metadata.firebaseapp.com",
@@ -72,10 +77,24 @@
             appId: "1:426427161628:web:22a0f220400cfc5c1a93d9"
         };
 
+        // 3. Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+        const auth = getAuth(app);
 
-        // SAVE OR UPDATE FUNCTION
+        // 4. Silent Login Logic
+        // REPLACE "admin@jts.com" with the actual email you created in Firebase Auth
+        signInWithEmailAndPassword(auth, "admin@jts.com", "02042022")
+            .then(() => {
+                document.getElementById('auth-status').innerText = "✅ Database Unlocked";
+                console.log("Logged in!");
+            })
+            .catch((error) => {
+                document.getElementById('auth-status').innerText = "❌ Access Denied: " + error.message;
+                console.error("Login failed:", error.message);
+            });
+
+        // 5. Database Functions
         window.uploadToFirebase = function() {
             const id = document.getElementById('p-id').value.trim();
             if(!id) return alert("Please enter a Unique ID");
@@ -94,39 +113,31 @@
             };
 
             set(ref(db, 'products/' + id), productData)
-                .then(() => {
-                    alert("✅ Market Updated!");
-                    // Optional: Clear form
-                    // document.querySelectorAll('input, textarea').forEach(i => i.value = "");
-                })
-                .catch((err) => alert("❌ Error: " + err));
+                .then(() => alert("✅ Market Updated!"))
+                .catch((err) => alert("❌ Permission Denied. Are you logged in?"));
         }
 
-        // LOAD DATA INTO TABLE
         const inventoryBody = document.getElementById('inventory-list');
         onValue(ref(db, 'products'), (snapshot) => {
             const data = snapshot.val();
             inventoryBody.innerHTML = "";
-            
             if (!data) {
                 inventoryBody.innerHTML = "<tr><td colspan='4'>No products found.</td></tr>";
                 return;
             }
-
             for(let id in data) {
                 const p = data[id];
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td><code>${p.id}</code></td>
                     <td><span class="edit-link" onclick="editProduct('${id}')">${p.brand} - ${p.name_en}</span></td>
-                    <td>RM ${p.price.toFixed(2)}</td>
+                    <td>RM ${parseFloat(p.price).toFixed(2)}</td>
                     <td><button class="delete-btn" onclick="removeProduct('${id}')">🗑️ Remove</button></td>
                 `;
                 inventoryBody.appendChild(row);
             }
         });
 
-        // EDIT FUNCTION (Fills the form)
         window.editProduct = function(id) {
             onValue(ref(db, 'products/' + id), (snapshot) => {
                 const p = snapshot.val();
@@ -139,14 +150,13 @@
                     document.getElementById('p-category').value = p.category;
                     document.getElementById('p-img').value = p.main_img || "";
                     document.getElementById('p-desc').value = p.desc_en || "";
-                    window.scrollTo(0,0); // Scroll to top to see the form
+                    window.scrollTo(0,0);
                 }
             }, { onlyOnce: true });
         }
 
-        // DELETE FUNCTION
         window.removeProduct = function(id) {
-            if(confirm("Permanently remove this item from the shop?")) {
+            if(confirm("Permanently remove this item?")) {
                 remove(ref(db, 'products/' + id));
             }
         }
