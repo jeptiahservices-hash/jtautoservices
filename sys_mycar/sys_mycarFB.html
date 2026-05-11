@@ -1,9 +1,7 @@
-<!-- Replace your existing script section with this -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-    // Your Firebase Config (Keep this exactly as your other pages)
     const firebaseConfig = {
         apiKey: "AIzaSyAOkSn53iUrBiHO-5wS1t4vcJwW46yAoqs",
         authDomain: "jtautoservices-metadata.firebaseapp.com",
@@ -17,25 +15,31 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // Make the function global so the button can see it
     window.checkService = function() {
         const input = document.getElementById('regInput').value.trim().toUpperCase();
         const resultDiv = document.getElementById('reportResult');
         
         if (!input) return alert("Please enter a plate number");
 
-        // Reference to the specific plate in Firebase
-        const dbRef = ref(db);
-        get(child(dbRef, `serviceRecords/${input}`)).then((snapshot) => {
+        // Show a simple loading state
+        resultDiv.style.display = 'block';
+        resultDiv.innerHTML = "<p style='text-align:center;'>Searching database...</p>";
+
+        // Direct path to the specific car record
+        const recordRef = ref(db, `serviceRecords/${input}`);
+
+        get(recordRef).then((snapshot) => {
             if (snapshot.exists()) {
                 const data = snapshot.val();
                 
-                // Build Parts List HTML
+                // Build Parts List HTML (Safe check)
                 let partsHTML = '';
-                if(data.partsChanged) {
+                if (data.partsChanged && Array.isArray(data.partsChanged)) {
                     data.partsChanged.forEach(item => {
                         partsHTML += `<li>${item}</li>`;
                     });
+                } else {
+                    partsHTML = "<li>No specific parts listed</li>";
                 }
 
                 resultDiv.innerHTML = `
@@ -43,34 +47,33 @@
                         <img src="${data.carImage || 'https://via.placeholder.com/600x250?text=No+Photo'}" class="car-photo" alt="Car Photo">
                         <div class="content">
                             <h2 style="margin:0">${input}</h2>
-                            <p style="color:var(--text-dim)">Customer Name: ${data.customerName}</p>
-                            <p style="color:var(--text-dim)">Car Brands / Model: ${data.cardetails}</p>
+                            <p style="color:var(--text-dim)">Customer Name: ${data.customerName || 'N/A'}</p>
+                            <p style="color:var(--text-dim)">Model: ${data.cardetails || 'N/A'}</p>
                             
-                            <span class="section-title">Summary</span>
-                            <p><strong>Date:</strong> ${data.lastService} | <strong>Mileage:</strong> ${data.mileage}</p>
+                            <span class="section-title">Service Summary</span>
+                            <p><strong>Date:</strong> ${data.lastService || 'N/A'} | <strong>Mileage:</strong> ${data.mileage || 'N/A'}</p>
                             
                             <span class="section-title">Items Replaced</span>
                             <ul class="parts-list">${partsHTML}</ul>
 
                             <span class="section-title">Additional Remarks</span>
-                            <p>${data.details}</p>
+                            <p>${data.details || 'No additional remarks.'}</p>
 
                             <a href="${data.driveLink}" target="_blank" class="pdf-btn">📄 View Full PDF Invoice</a>
                             
-                            <p style="margin-top:20px; color:#ffca28; font-size:0.9rem;">
-                                Next Service: ${data.nextService}
+                            <p style="margin-top:20px; color:#ffca28; font-size:1.1rem; font-weight:bold;">
+                                📅 Next Service: ${data.nextService || 'Check with Workshop'}
                             </p>
                         </div>
                     </div>
                 `;
-                resultDiv.style.display = 'block';
             } else {
                 resultDiv.style.display = 'none';
                 alert("No record found for: " + input);
             }
         }).catch((error) => {
             console.error(error);
-            alert("Error fetching records.");
+            alert("Error connecting to database. Please check your connection.");
         });
     }
 </script>
