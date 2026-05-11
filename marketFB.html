@@ -5,6 +5,83 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JTS Market | Genuine Parts</title>
     <style>
+        /* Floating Basket Button */
+.basket-fab {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: var(--primary-color);
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    cursor: pointer;
+    z-index: 2500;
+    transition: transform 0.2s;
+}
+.basket-fab:active { transform: scale(0.9); }
+.basket-count {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: #ff4444;
+    color: white;
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+/* Full Screen Basket Overlay */
+#basketModal {
+    display: none;
+    position: fixed;
+    z-index: 4000;
+    left: 0; top: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(8px);
+}
+
+.basket-content {
+    background: var(--card-bg);
+    margin: 50px auto;
+    width: 90%;
+    max-width: 450px;
+    border-radius: 15px;
+    padding: 20px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.basket-items-list {
+    overflow-y: auto;
+    flex-grow: 1;
+    margin: 15px 0;
+}
+
+.cart-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 10px 0;
+    border-bottom: 1px solid #374151;
+}
+
+.cart-item img { width: 50px; height: 50px; object-fit: cover; border-radius: 5px; }
+
+.cart-item-info { flex-grow: 1; }
+.cart-item-info h4 { margin: 0; font-size: 0.9rem; }
+.cart-item-info p { margin: 0; color: var(--primary-color); font-weight: bold; }
+
+.remove-item { color: #ff4444; cursor: pointer; font-size: 1.2rem; margin-left: 10px; }
+
+/* Hide the old bottom bar if you want, or keep it for the total */
+.basket-bar { display: none !important; }
+        
         :root {
             --primary-color: #2563eb;
             --dark-bg: #111827;
@@ -206,171 +283,235 @@
         </div>
     </div>
 
-    <div class="basket-bar">
-        <div>
-            <button onclick="clearBasket()" style="background:none; color:#ff4444; border:none; font-size:0.7rem; text-decoration:underline; cursor:pointer;">CLEAR ITEMS</button>
-            <div class="total-amount">RM <span id="total-price">0</span></div>
-        </div>
-        <button class="checkout-btn" onclick="sendToWhatsApp()" data-en="Order Now" data-bm="Buat Pesanan">Order Now</button>
-    </div>
+    <!-- Floating Action Button -->
+<div class="basket-fab" onclick="toggleBasket()">
+    <span style="font-size: 1.5rem;">🛒</span>
+    <span class="basket-count" id="cart-badge">0</span>
+</div>
 
-    <div id="productModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closePopup()">&times;</span>
-            <div id="modalDetails"></div>
+<!-- The Basket Popup -->
+<div id="basketModal">
+    <div class="basket-content">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h2 style="margin:0;">Your Basket</h2>
+            <span onclick="toggleBasket()" style="cursor:pointer; font-size:2rem;">&times;</span>
+        </div>
+        
+        <div id="basketList" class="basket-items-list">
+            <!-- Items will appear here -->
+        </div>
+
+        <div style="border-top: 2px solid #374151; padding-top:15px;">
+            <div style="display:flex; justify-content:space-between; font-size:1.2rem; font-weight:bold; margin-bottom:15px;">
+                <span>Total:</span>
+                <span>RM <span id="cart-total">0.00</span></span>
+            </div>
+            <button class="checkout-btn" onclick="sendToWhatsApp()" style="width:100%;">Confirm & Order via WhatsApp</button>
+            <button onclick="clearBasket()" style="background:none; border:none; color:#9ca3af; width:100%; margin-top:10px; text-decoration:underline; cursor:pointer;">Clear All</button>
         </div>
     </div>
+</div>
 
     <!-- 1. Firebase SDKs -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // 2. Your Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyAOkSn53iUrBiHO-5wS1t4vcJwW46yAoqs",
-            authDomain: "jtautoservices-metadata.firebaseapp.com",
-            databaseURL: "https://jtautoservices-metadata-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "jtautoservices-metadata",
-            storageBucket: "jtautoservices-metadata.firebasestorage.app",
-            messagingSenderId: "426427161628",
-            appId: "1:426427161628:web:22a0f220400cfc5c1a93d9"
-        };
+    // 1. Firebase Configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyAOkSn53iUrBiHO-5wS1t4vcJwW46yAoqs",
+        authDomain: "jtautoservices-metadata.firebaseapp.com",
+        databaseURL: "https://jtautoservices-metadata-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "jtautoservices-metadata",
+        storageBucket: "jtautoservices-metadata.firebasestorage.app",
+        messagingSenderId: "426427161628",
+        appId: "1:426427161628:web:22a0f220400cfc5c1a93d9"
+    };
 
-        // 3. Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
-        // --- GLOBAL VARIABLES ---
-        window.basket = {};
-        window.allProducts = [];
+    // --- GLOBAL VARIABLES ---
+    window.basket = {}; // New format: { "id": {name, price, qty, img} }
+    window.allProducts = [];
 
-        // 4. REAL-TIME DATA LISTENER
-        // This replaces your old loadProducts() function
-        onValue(ref(db, 'products'), (snapshot) => {
-            const data = snapshot.val();
-            window.allProducts = []; 
+    // 2. REAL-TIME DATA LISTENER
+    onValue(ref(db, 'products'), (snapshot) => {
+        const data = snapshot.val();
+        window.allProducts = []; 
+        if (data) {
+            for (let id in data) { window.allProducts.push(data[id]); }
+        }
+        window.renderMarket();
+        window.setLanguage(localStorage.getItem('preferredLang') || 'en');
+    });
+
+    // --- MARKET RENDERING ---
+    window.renderMarket = function() {
+        document.querySelectorAll('.market-grid').forEach(grid => grid.innerHTML = '');
+
+        window.allProducts.forEach(item => {
+            const section = document.getElementById(item.category);
+            if (!section) return;
+            const grid = section.querySelector('.market-grid');
             
-            if (data) {
-                for (let id in data) {
-                    window.allProducts.push(data[id]);
-                }
-            }
-            renderMarket();
-            setLanguage(localStorage.getItem('preferredLang') || 'en');
-        });
-
-        // --- MARKET FUNCTIONS ---
-        window.renderMarket = function() {
-            // Clear all grids first to prevent duplicates on refresh
-            document.querySelectorAll('.market-grid').forEach(grid => grid.innerHTML = '');
-
-            window.allProducts.forEach(item => {
-                const section = document.getElementById(item.category);
-                if (!section) return;
-                const grid = section.querySelector('.market-grid');
-                
-                const card = document.createElement('div');
-                card.className = 'product-card';
-                card.setAttribute('data-name', (item.name_en + " " + (item.brand || "") + " " + (item.badge || "")).toLowerCase());
-                
-                card.innerHTML = `
-                    <div onclick="openPopup('${item.id}')" style="cursor:pointer">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
-                            <span class="brand-label">${item.brand || ''}</span>
-                            <span class="fit-badge">${item.badge || 'Genuine'}</span>
-                        </div>
-                        <img src="${item.main_img || 'assets/no-image.png'}">
-                        <h4 style="margin:5px 0; font-size:0.9rem;">${item.name_en}</h4>
-                        <span class="price">RM ${parseFloat(item.price).toFixed(2)}</span>
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.setAttribute('data-name', (item.name_en + " " + (item.brand || "")).toLowerCase());
+            
+            card.innerHTML = `
+                <div onclick="openPopup('${item.id}')" style="cursor:pointer">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+                        <span class="brand-label">${item.brand || ''}</span>
+                        <span class="fit-badge">${item.badge || 'Genuine'}</span>
                     </div>
-                    <div class="qty-controls">
-                        <button class="qty-btn" onclick="changeQty('${item.id}', -1, ${item.price})">-</button>
-                        <input class="qty-input" id="qty-${item.id}" value="${window.basket[item.id]?.qty || 0}" readonly>
-                        <button class="qty-btn" onclick="changeQty('${item.id}', 1, ${item.price})">+</button>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-        };
-
-        window.openPopup = function(id) {
-            const item = window.allProducts.find(p => p.id === id);
-            const container = document.getElementById('modalDetails');
-            container.innerHTML = `
-                <h2 style="color:var(--primary-color); margin-top:10px;">${item.name_en}</h2>
-                <p><strong>Brand:</strong> ${item.brand || 'N/A'}</p>
-                <div class="modal-gallery">
-                    <img src="${item.main_img}">
-                    ${item.gallery ? item.gallery.map(img => `<img src="${img}">`).join('') : ''}
+                    <img src="${item.main_img || 'assets/no-image.png'}">
+                    <h4 style="margin:5px 0; font-size:0.85rem; height:35px; overflow:hidden;">${item.name_en}</h4>
+                    <span class="price">RM ${parseFloat(item.price).toFixed(2)}</span>
                 </div>
-                <p style="font-size:0.9rem;">${item.desc_en || ''}</p>
-                <p style="font-size:0.8rem; color:#9ca3af;">${item.name_bm || ''}</p>
-                ${item.shopee_link ? `
-                    <a href="${item.shopee_link}" target="_blank" class="shopee-btn">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/f/fe/Shopee.svg" alt="Shopee Icon" style="width:18px; height:18px; margin-right:8px;">
-                        Buy on Shopee
-                    </a>` : ''}
+                <button onclick="addToCart('${item.id}')" style="background:var(--primary-color); color:white; border:none; width:100%; padding:10px; border-radius:8px; cursor:pointer; font-weight:bold; margin-top:10px;">
+                    + Add to Basket
+                </button>
             `;
-            document.getElementById('productModal').style.display = "block";
-        };
+            grid.appendChild(card);
+        });
+    };
 
-        window.closePopup = function() { document.getElementById('productModal').style.display = "none"; };
+    // --- NEW BASKET LOGIC ---
+    window.toggleBasket = function() {
+        const modal = document.getElementById('basketModal');
+        modal.style.display = (modal.style.display === "block") ? "none" : "block";
+        if(modal.style.display === "block") window.renderBasketItems();
+    };
 
-        window.changeQty = function(id, change, price) {
-            const input = document.getElementById(`qty-${id}`);
-            let qty = (parseInt(input.value) || 0) + change;
-            if (qty < 0) qty = 0;
-            if (input) input.value = qty;
-            
-            if (qty > 0) {
-                window.basket[id] = { qty, price };
-            } else {
-                delete window.basket[id];
-            }
-            updateTotal();
-        };
+    window.addToCart = function(id) {
+        const item = window.allProducts.find(p => p.id === id);
+        if (!window.basket[id]) {
+            window.basket[id] = { 
+                name: item.name_en, 
+                price: parseFloat(item.price), 
+                qty: 1, 
+                img: item.main_img 
+            };
+        } else {
+            window.basket[id].qty += 1;
+        }
+        window.updateBasketUI();
+        
+        // Button Feedback
+        const fab = document.querySelector('.basket-fab');
+        fab.style.transform = "scale(1.2)";
+        setTimeout(() => fab.style.transform = "scale(1)", 200);
+    };
 
-        window.updateTotal = function() {
-            let total = 0;
-            for (let id in window.basket) { 
-                total += window.basket[id].qty * window.basket[id].price; 
-            }
-            document.getElementById('total-price').innerText = total.toFixed(2);
-        };
+    window.updateQty = function(id, delta) {
+        if (window.basket[id]) {
+            window.basket[id].qty += delta;
+            if (window.basket[id].qty <= 0) delete window.basket[id];
+        }
+        window.updateBasketUI();
+        window.renderBasketItems();
+    };
 
-        window.filterProducts = function() {
-            let term = document.getElementById('productSearch').value.toLowerCase();
-            document.querySelectorAll('.product-card').forEach(card => {
-                card.style.display = card.getAttribute('data-name').includes(term) ? "" : "none";
-            });
-        };
+    window.removeFromCart = function(id) {
+        delete window.basket[id];
+        window.updateBasketUI();
+        window.renderBasketItems();
+    };
 
-        window.clearBasket = function() {
-            if(!confirm("Clear all items?")) return;
+    window.updateBasketUI = function() {
+        let count = 0;
+        let total = 0;
+        for (let id in window.basket) {
+            count += window.basket[id].qty;
+            total += window.basket[id].qty * window.basket[id].price;
+        }
+        document.getElementById('cart-badge').innerText = count;
+        document.getElementById('cart-total').innerText = total.toFixed(2);
+    };
+
+    window.renderBasketItems = function() {
+        const container = document.getElementById('basketList');
+        container.innerHTML = "";
+        
+        if (Object.keys(window.basket).length === 0) {
+            container.innerHTML = "<p style='text-align:center; padding:20px; color:#9ca3af;'>Your basket is empty.</p>";
+            return;
+        }
+
+        for (let id in window.basket) {
+            const item = window.basket[id];
+            const div = document.createElement('div');
+            div.className = 'cart-item';
+            div.innerHTML = `
+                <img src="${item.img}" style="width:50px; height:50px; object-fit:cover; border-radius:5px;">
+                <div style="flex-grow:1; margin-left:10px;">
+                    <h4 style="margin:0; font-size:0.9rem;">${item.name}</h4>
+                    <p style="margin:0; color:var(--primary-color); font-weight:bold;">RM ${item.price.toFixed(2)}</p>
+                    <div style="display:flex; align-items:center; gap:10px; margin-top:5px;">
+                        <button onclick="updateQty('${id}', -1)" style="width:25px; height:25px; cursor:pointer;">-</button>
+                        <span>${item.qty}</span>
+                        <button onclick="updateQty('${id}', 1)" style="width:25px; height:25px; cursor:pointer;">+</button>
+                    </div>
+                </div>
+                <span onclick="removeFromCart('${id}')" style="color:#ff4444; cursor:pointer; font-size:1.2rem;">🗑️</span>
+            `;
+            container.appendChild(div);
+        }
+    };
+
+    window.clearBasket = function() {
+        if(confirm("Clear your entire basket?")) {
             window.basket = {};
-            document.querySelectorAll('.qty-input').forEach(i => i.value = 0);
-            updateTotal();
-        };
+            window.updateBasketUI();
+            window.toggleBasket();
+        }
+    };
 
-        window.sendToWhatsApp = function() {
-            let total = document.getElementById('total-price').innerText;
-            if (total === "0.00") return alert("Please select items first!");
-            let msg = "*NEW ORDER - JTS MARKET*%0A--------------------------%0A";
-            for (let id in window.basket) {
-                const p = window.allProducts.find(item => item.id === id);
-                msg += `• ${p.brand} ${p.name_en} (x${window.basket[id].qty})%0A`;
-            }
-            msg += `--------------------------%0A*TOTAL: RM ${total}*`;
-            window.open(`https://wa.me/60165250890?text=${msg}`, '_blank');
-        };
+    // --- WHATSAPP ORDER ---
+    window.sendToWhatsApp = function() {
+        let total = document.getElementById('cart-total').innerText;
+        if (total === "0.00") return alert("Your basket is empty!");
+        
+        let msg = "*🛒 NEW ORDER - JTS MARKET*%0A--------------------------%0A";
+        for (let id in window.basket) {
+            const item = window.basket[id];
+            msg += `• ${item.name} (x${item.qty}) - RM ${(item.qty * item.price).toFixed(2)}%0A`;
+        }
+        msg += `--------------------------%0A*TOTAL: RM ${total}*`;
+        window.open(`https://wa.me/60165250890?text=${msg}`, '_blank');
+    };
 
-        window.setLanguage = function(lang) {
-            document.querySelectorAll('[data-en]').forEach(el => {
-                el.innerText = el.getAttribute('data-' + lang);
-            });
-            localStorage.setItem('preferredLang', lang);
-        };
-    </script>
+    // --- EXISTING MODAL & SEARCH ---
+    window.openPopup = function(id) {
+        const item = window.allProducts.find(p => p.id === id);
+        const container = document.getElementById('modalDetails');
+        container.innerHTML = `
+            <h2 style="color:var(--primary-color);">${item.name_en}</h2>
+            <div class="modal-gallery"><img src="${item.main_img}" style="width:100%; border-radius:10px;"></div>
+            <p>${item.desc_en || ''}</p>
+            <button onclick="addToCart('${item.id}'); closePopup();" style="background:#25d366; color:white; border:none; padding:12px; width:100%; border-radius:8px; font-weight:bold; cursor:pointer;">
+                Add to Basket & Continue Shopping
+            </button>
+        `;
+        document.getElementById('productModal').style.display = "block";
+    };
+
+    window.closePopup = function() { document.getElementById('productModal').style.display = "none"; };
+
+    window.filterProducts = function() {
+        let term = document.getElementById('productSearch').value.toLowerCase();
+        document.querySelectorAll('.product-card').forEach(card => {
+            card.style.display = card.getAttribute('data-name').includes(term) ? "" : "none";
+        });
+    };
+
+    window.setLanguage = function(lang) {
+        document.querySelectorAll('[data-en]').forEach(el => {
+            el.innerText = el.getAttribute('data-' + lang);
+        });
+        localStorage.setItem('preferredLang', lang);
+    };
+</script>
 </body>
 </html>
