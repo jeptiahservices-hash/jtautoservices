@@ -3,72 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JT Auto Services Ledger</title>
+    <title>JTS | Financial Ledger</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; margin: 20px; }
-        .container { max-width: 900px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-        h1 { color: #1a73e8; text-align: center; margin-bottom: 5px; }
-        p.subtitle { text-align: center; color: #666; margin-bottom: 30px; }
-        
-        .balance-card { background: #1a73e8; color: white; padding: 20px; border-radius: 8px; text-align: center; margin-bottom: 25px; }
-        .balance-card h2 { margin: 0; font-size: 2em; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #0b0e14; color: #c9d1d9; margin: 20px; }
+        .container { max-width: 1000px; margin: auto; background: #161b22; padding: 30px; border-radius: 12px; border: 1px solid #30363d; }
+        h1 { color: #58a6ff; text-align: center; margin-bottom: 5px; }
+        .balance-card { background: #1f6feb; color: white; padding: 20px; border-radius: 8px; text-align: center; margin-bottom: 25px; }
+        .balance-card h2 { margin: 0; font-size: 2.5em; }
 
-        form { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; background: #fafafa; padding: 20px; border-radius: 8px; border: 1px solid #eee; }
+        form { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; background: #0d1117; padding: 20px; border-radius: 8px; border: 1px solid #30363d; }
         .form-group { display: flex; flex-direction: column; }
-        label { font-weight: 600; margin-bottom: 5px; color: #444; font-size: 0.9em; }
-        input, select { padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 1em; }
+        label { font-size: 0.8rem; margin-bottom: 5px; color: #8b949e; }
+        input, select { padding: 10px; background: #161b22; border: 1px solid #30363d; border-radius: 5px; color: white; }
         
-        button { grid-column: span 1; padding: 12px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 10px; transition: background 0.3s; }
-        button:hover { background-color: #218838; }
+        .btn-add { background: #238636; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold; align-self: flex-end; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 30px; background: #161b22; font-size: 0.9rem; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #30363d; }
+        th { color: #58a6ff; text-transform: uppercase; }
+        
+        .credit { color: #39d353; } /* Income */
+        .debit { color: #f85149; }  /* Expense */
+        
+        .action-btn { cursor: pointer; margin-right: 10px; border: none; background: none; font-size: 1.1rem; }
+        .edit-btn { color: #58a6ff; }
+        .del-btn { color: #f85149; }
 
-        table { width: 100%; border-collapse: collapse; margin-top: 30px; background: white; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
-        th { background-color: #f8f9fa; color: #555; text-transform: uppercase; font-size: 0.8em; }
-        .credit { color: #28a745; font-weight: bold; }
-        .debit { color: #dc3545; font-weight: bold; }
-        .rm-symbol { font-size: 0.9em; color: #888; margin-right: 2px; }
+        /* Simple Modal for Editing */
+        #editModal { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:#161b22; padding:30px; border:2px solid #58a6ff; border-radius:12px; z-index:100; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>JT Auto Services</h1>
-    <p class="subtitle">Financial Transaction Record</p>
+    <p style="text-align:center; color:#8b949e;">Workshop Ledger System</p>
 
     <div class="balance-card">
-        <small>Current Balance</small>
+        <small>Current Cash Flow Balance</small>
         <h2>RM <span id="totalBalance">0.00</span></h2>
     </div>
 
+    <!-- ADD RECORD FORM -->
     <form id="recordForm">
+        <input type="hidden" id="editKey"> <!-- Hidden field for editing -->
         <div class="form-group">
-            <label for="date">Date</label>
+            <label>Date</label>
             <input type="date" id="date" required>
         </div>
         <div class="form-group" style="flex-grow: 2;">
-            <label for="detail">Detail / Description</label>
-            <input type="text" id="detail" placeholder="Nature of transaction" required>
+            <label>Detail</label>
+            <input type="text" id="detail" placeholder="Service / Item Name" required>
         </div>
         <div class="form-group">
-            <label for="amount">Amount (RM)</label>
-            <input type="number" id="amount" step="0.01" placeholder="0.00" required>
+            <label>Amount (RM)</label>
+            <input type="number" id="amount" step="0.01" required>
         </div>
         <div class="form-group">
-            <label for="type">Type</label>
+            <label>Type</label>
             <select id="type">
                 <option value="credit">Debit (Income)</option>
                 <option value="debit">Credit (Expense)</option>
             </select>
         </div>
         <div class="form-group">
-            <label for="payment">Payment Via</label>
+            <label>Via</label>
             <select id="payment">
                 <option value="Cash">Cash</option>
-                <option value="Online Banking">Online Banking</option>
-                <option value="QR Code">QR Code</option>
+                <option value="Transfer">Online</option>
+                <option value="QR">QR Code</option>
             </select>
         </div>
-        <button type="submit">Add Record</button>
+        <button type="submit" class="btn-add" id="submitBtn">Add Record</button>
     </form>
 
     <table id="ledgerTable">
@@ -76,65 +82,129 @@
             <tr>
                 <th>Date</th>
                 <th>Detail</th>
-                <th>Payment Via</th>
+                <th>Via</th>
                 <th>Type</th>
-                <th>Amount (RM)</th>
+                <th>Amount</th>
+                <th>Actions</th>
             </tr>
         </thead>
-        <tbody>
-            <!-- Dynamic Rows  -->
-        </tbody>
+        <tbody id="ledgerBody"></tbody>
     </table>
 </div>
 
-<script>
-    // 1. Auto-fill Todays Date
-    window.onload = function() {
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('date').value = today;
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAOkSn53iUrBiHO-5wS1t4vcJwW46yAoqs",
+        authDomain: "jtautoservices-metadata.firebaseapp.com",
+        databaseURL: "https://jtautoservices-metadata-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "jtautoservices-metadata",
+        storageBucket: "jtautoservices-metadata.firebasestorage.app",
+        messagingSenderId: "426427161628",
+        appId: "1:426427161628:web:22a0f220400cfc5c1a93d9"
     };
 
-    let balance = 0;
-    const form = document.getElementById('recordForm');
-    const tableBody = document.querySelector('#ledgerTable tbody');
-    const balanceDisplay = document.getElementById('totalBalance');
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const auth = getAuth(app);
 
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        // Input Data
-        const date = document.getElementById('date').value;
-        const detail = document.getElementById('detail').value;
-        const amount = parseFloat(document.getElementById('amount').value);
-        const type = document.getElementById('type').value;
-        const payment = document.getElementById('payment').value;
-
-        // Update Running Balance
-        if (type === 'credit') {
-            balance += amount;
-        } else {
-            balance -= amount;
-        }
-
-        // Create Table Row
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${date}</td>
-            <td>${detail}</td>
-            <td>${payment}</td>
-            <td class="${type}">${type.toUpperCase()}</td>
-            <td><span class="rm-symbol">RM</span>${amount.toFixed(2)}</td>
-        `;
-
-        // Add row to top of list
-        tableBody.prepend(row);
-
-        // Update Balance UI
-        balanceDisplay.textContent = balance.toFixed(2);
-
-        // Reset fields (keeping the date as current)
-        document.getElementById('detail').value = '';
-        document.getElementById('amount').value = '';
+    // 1. Protect Page
+    onAuthStateChanged(auth, (user) => {
+        if (!user) window.location.href = "login.html";
     });
+
+    // 2. Variables
+    const form = document.getElementById('recordForm');
+    const ledgerBody = document.getElementById('ledgerBody');
+    const balanceDisplay = document.getElementById('totalBalance');
+    const dateInput = document.getElementById('date');
+    dateInput.value = new Date().toISOString().split('T')[0];
+
+    // 3. Save / Update Record
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const key = document.getElementById('editKey').value;
+        
+        const data = {
+            date: document.getElementById('date').value,
+            detail: document.getElementById('detail').value,
+            amount: parseFloat(document.getElementById('amount').value),
+            type: document.getElementById('type').value,
+            payment: document.getElementById('payment').value
+        };
+
+        if (key) {
+            // Update existing
+            update(ref(db, `ledger/${key}`), data).then(() => {
+                document.getElementById('editKey').value = "";
+                document.getElementById('submitBtn').innerText = "Add Record";
+                form.reset();
+                dateInput.value = new Date().toISOString().split('T')[0];
+            });
+        } else {
+            // Add new
+            push(ref(db, 'ledger'), data);
+            form.reset();
+            dateInput.value = new Date().toISOString().split('T')[0];
+        }
+    });
+
+    // 4. Real-time Load Ledger
+    onValue(ref(db, 'ledger'), (snapshot) => {
+        ledgerBody.innerHTML = "";
+        let runningBalance = 0;
+        const data = snapshot.val();
+
+        if (data) {
+            // Convert to array and sort by date (newest first)
+            const sortedItems = Object.keys(data).map(key => ({
+                id: key, ...data[key]
+            })).sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            sortedItems.forEach(item => {
+                // Calc Balance
+                if (item.type === 'credit') runningBalance += item.amount;
+                else runningBalance -= item.amount;
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.date}</td>
+                    <td>${item.detail}</td>
+                    <td>${item.payment}</td>
+                    <td class="${item.type}">${item.type === 'credit' ? 'INCOME' : 'EXPENSE'}</td>
+                    <td>RM ${item.amount.toFixed(2)}</td>
+                    <td>
+                        <button class="action-btn edit-btn" onclick="prepareEdit('${item.id}', '${item.date}', '${item.detail}', ${item.amount}, '${item.type}', '${item.payment}')">✏️</button>
+                        <button class="action-btn del-btn" onclick="deleteRecord('${item.id}')">🗑️</button>
+                    </td>
+                `;
+                ledgerBody.appendChild(row);
+            });
+        }
+        balanceDisplay.innerText = runningBalance.toFixed(2);
+    });
+
+    // 5. Global Actions
+    window.deleteRecord = (id) => {
+        if(confirm("Delete this transaction?")) {
+            remove(ref(db, `ledger/${id}`));
+        }
+    };
+
+    window.prepareEdit = (id, date, detail, amount, type, payment) => {
+        document.getElementById('editKey').value = id;
+        document.getElementById('date').value = date;
+        document.getElementById('detail').value = detail;
+        document.getElementById('amount').value = amount;
+        document.getElementById('type').value = type;
+        document.getElementById('payment').value = payment;
+        document.getElementById('submitBtn').innerText = "Update Record";
+        window.scrollTo(0,0);
+    };
 </script>
 
+</body>
+</html>
