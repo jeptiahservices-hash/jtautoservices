@@ -1,79 +1,108 @@
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Record Search</title>
+    <!-- Paste your CSS here or keep it in the <style> tag you had before -->
+    <style>
+        /* (Keep your existing CSS here) */
+        #reportResult { margin-top: 20px; display: none; }
+        .report-card { background: #161b22; border-radius: 12px; padding: 20px; border: 1px solid #30363d; }
+        .car-photo { width: 100%; border-radius: 8px; margin-bottom: 15px; }
+        .section-title { color: #58a6ff; font-weight: bold; display: block; margin-top: 15px; }
+        .pdf-btn { display: inline-block; background: #238636; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; margin-top: 10px; }
+    </style>
+</head>
+<body>
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyAOkSn53iUrBiHO-5wS1t4vcJwW46yAoqs",
-        authDomain: "jtautoservices-metadata.firebaseapp.com",
-        databaseURL: "https://jtautoservices-metadata-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "jtautoservices-metadata",
-        storageBucket: "jtautoservices-metadata.firebasestorage.app",
-        messagingSenderId: "426427161628",
-        appId: "1:426427161628:web:22a0f220400cfc5c1a93d9"
-    };
+    <!-- IMPORTANT: These IDs must exist for the script to work! -->
+    <div style="text-align: center; padding: 20px;">
+        <input type="text" id="regInput" placeholder="ENTER PLATE NUMBER" style="padding: 10px; width: 250px;">
+        <button id="searchBtn" style="padding: 10px 20px; cursor: pointer;">SEARCH RECORDS</button>
+    </div>
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+    <div id="reportResult"></div>
 
-    window.checkService = function() {
-        const input = document.getElementById('regInput').value.trim().toUpperCase();
-        const resultDiv = document.getElementById('reportResult');
-        
-        if (!input) return alert("Please enter a plate number");
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // Show a simple loading state
-        resultDiv.style.display = 'block';
-        resultDiv.innerHTML = "<p style='text-align:center;'>Searching database...</p>";
+        const firebaseConfig = {
+            apiKey: "AIzaSyAOkSn53iUrBiHO-5wS1t4vcJwW46yAoqs",
+            authDomain: "jtautoservices-metadata.firebaseapp.com",
+            databaseURL: "https://jtautoservices-metadata-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "jtautoservices-metadata",
+            storageBucket: "jtautoservices-metadata.firebasestorage.app",
+            messagingSenderId: "426427161628",
+            appId: "1:426427161628:web:22a0f220400cfc5c1a93d9"
+        };
 
-        // Direct path to the specific car record
-        const recordRef = ref(db, `serviceRecords/${input}`);
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
 
-        get(recordRef).then((snapshot) => {
-            if (snapshot.exists()) {
-                const data = snapshot.val();
-                
-                // Build Parts List HTML (Safe check)
-                let partsHTML = '';
-                if (data.partsChanged && Array.isArray(data.partsChanged)) {
-                    data.partsChanged.forEach(item => {
-                        partsHTML += `<li>${item}</li>`;
-                    });
-                } else {
-                    partsHTML = "<li>No specific parts listed</li>";
-                }
-
-                resultDiv.innerHTML = `
-                    <div class="report-card">
-                        <img src="${data.carImage || 'https://via.placeholder.com/600x250?text=No+Photo'}" class="car-photo" alt="Car Photo">
-                        <div class="content">
-                            <h2 style="margin:0">${input}</h2>
-                            <p style="color:var(--text-dim)">Customer Name: ${data.customerName || 'N/A'}</p>
-                            <p style="color:var(--text-dim)">Model: ${data.cardetails || 'N/A'}</p>
-                            
-                            <span class="section-title">Service Summary</span>
-                            <p><strong>Date:</strong> ${data.lastService || 'N/A'} | <strong>Mileage:</strong> ${data.mileage || 'N/A'}</p>
-                            
-                            <span class="section-title">Items Replaced</span>
-                            <ul class="parts-list">${partsHTML}</ul>
-
-                            <span class="section-title">Additional Remarks</span>
-                            <p>${data.details || 'No additional remarks.'}</p>
-
-                            <a href="${data.driveLink}" target="_blank" class="pdf-btn">📄 View Full PDF Invoice</a>
-                            
-                            <p style="margin-top:20px; color:#ffca28; font-size:1.1rem; font-weight:bold;">
-                                📅 Next Service: ${data.nextService || 'Check with Workshop'}
-                            </p>
-                        </div>
-                    </div>
-                `;
-            } else {
-                resultDiv.style.display = 'none';
-                alert("No record found for: " + input);
-            }
-        }).catch((error) => {
-            console.error(error);
-            alert("Error connecting to database. Please check your connection.");
+        // Link the button click to our function
+        document.getElementById('searchBtn').addEventListener('click', () => {
+            checkService();
         });
-    }
-</script>
+
+        async function checkService() {
+            const input = document.getElementById('regInput').value.trim().toUpperCase();
+            const resultDiv = document.getElementById('reportResult');
+            
+            if (!input) return alert("Please enter a plate number");
+
+            resultDiv.innerHTML = "<p style='text-align:center;'>Searching...</p>";
+            resultDiv.style.display = 'block';
+
+            const dbRef = ref(db);
+            try {
+                const snapshot = await get(child(dbRef, `serviceRecords/${input}`));
+                
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    
+                    let partsHTML = '';
+                    if (data.partsChanged && Array.isArray(data.partsChanged)) {
+                        partsHTML = data.partsChanged.map(item => `<li>${item}</li>`).join('');
+                    } else {
+                        partsHTML = '<li>No parts listed.</li>';
+                    }
+
+                    resultDiv.innerHTML = `
+                        <div class="report-card">
+                            <img src="${data.carImage || 'https://via.placeholder.com/600x250?text=No+Photo'}" class="car-photo" alt="Car Photo">
+                            <div class="content">
+                                <h2 style="margin:0; color:white;">${input}</h2>
+                                <p style="color:#8b949e">Customer: ${data.customerName || 'N/A'}</p>
+                                <p style="color:#8b949e">Model: ${data.cardetails || 'N/A'}</p>
+                                
+                                <span class="section-title">Summary</span>
+                                <p><strong>Date:</strong> ${data.lastService || 'N/A'} | <strong>Mileage:</strong> ${data.mileage || 'N/A'}</p>
+                                
+                                <span class="section-title">Items Replaced</span>
+                                <ul class="parts-list" style="color:#c9d1d9;">${partsHTML}</ul>
+
+                                <span class="section-title">Additional Remarks</span>
+                                <p>${data.details || 'None.'}</p>
+
+                                <a href="${data.driveLink || '#'}" target="_blank" class="pdf-btn">📄 View Full PDF Invoice</a>
+                                
+                                <p style="margin-top:20px; color:#ffca28; font-size:0.9rem; font-weight:bold;">
+                                    Next Service: ${data.nextService || 'Contact JTS'}
+                                </p>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.style.display = 'none';
+                    alert("No record found for: " + input);
+                }
+            } catch (error) {
+                console.error(error);
+                alert("Error fetching records. Check console for details.");
+            }
+        }
+    </script>
+</body>
+</html>
