@@ -1,0 +1,72 @@
+<script type="module">
+    // 1. ALL IMPORTS FIRST
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    // 2. CONFIGURATION
+    const firebaseConfig = {
+        apiKey: "AIzaSyAOkSn53iUrBiHO-5wS1t4vcJwW46yAoqs",
+        authDomain: "jtautoservices-metadata.firebaseapp.com",
+        databaseURL: "https://jtautoservices-metadata-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "jtautoservices-metadata",
+        storageBucket: "jtautoservices-metadata.firebasestorage.app",
+        messagingSenderId: "426427161628",
+        appId: "1:426427161628:web:22a0f220400cfc5c1a93d9"
+    };
+
+    // 3. INITIALIZE SERVICES
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const auth = getAuth(app);
+
+    // 4. SECURITY CHECK (Runs immediately)
+    onAuthStateChanged(auth, (user) => {
+        if (!user) {
+            alert("Access Denied. Please login first.");
+            window.location.href = "login.html"; 
+        }
+    });
+
+    // 5. FUNCTIONS (Global window binding)
+    window.addPartRow = function() {
+        const container = document.getElementById('partsList');
+        const div = document.createElement('div');
+        div.className = 'part-row';
+        div.innerHTML = '<input type="text" class="part-item" placeholder="e.g. Oil Filter">';
+        container.appendChild(div);
+    }
+
+    window.saveRecord = function() {
+        const plate = document.getElementById('plate').value.trim().toUpperCase();
+        if(!plate) return alert("Plate number is required!");
+
+        const parts = [];
+        document.querySelectorAll('.part-item').forEach(input => {
+            if(input.value.trim()) parts.push(input.value.trim());
+        });
+
+        const recordData = {
+            customerName: document.getElementById('custName').value,
+            cardetails: document.getElementById('carModel').value,
+            lastService: document.getElementById('serviceDate').value,
+            mileage: document.getElementById('mileage').value,
+            carImage: document.getElementById('imgUrl').value,
+            driveLink: document.getElementById('pdfUrl').value,
+            details: document.getElementById('remarks').value,
+            nextService: document.getElementById('nextService').value,
+            partsChanged: parts,
+            updatedAt: new Date().toISOString() // Added this to track when you saved it
+        };
+
+        set(ref(db, 'serviceRecords/' + plate), recordData)
+            .then(() => {
+                alert("✅ Record Saved Successfully for " + plate);
+                location.reload(); 
+            })
+            .catch(err => {
+                console.error(err);
+                alert("❌ Error: " + err.message);
+            });
+    }
+</script>
