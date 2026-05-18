@@ -32,6 +32,7 @@
             width: 220px; /* Adjust size as needed */
             height: auto;
             margin-bottom: 1.5rem;
+            object-fit: contain;
         }
 
         h2 {
@@ -85,7 +86,8 @@
 <body>
 
 <div class="login-card">
-    <img src="Data/images/logo.png" alt="Company Logo" class="company-logo">
+    <!-- YOUR ORIGINAL BRANDING LOGO -->
+    <img src="Data/images/logo.png" alt="Company Logo" class="company-logo" onerror="this.src='images/logow.png'">
     
     <h2>JTS Admin Tools</h2>
     
@@ -98,19 +100,63 @@
     <p id="message"></p>
 </div>
 
-<script>
+<!-- SECURE FIREBASE ENGINE LOGIC -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, setPersistence, browserLocalPersistence, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAOkSn53iUrBiHO-5wS1t4vcJwW46yAoqs",
+        authDomain: "jtautoservices-metadata.firebaseapp.com",
+        databaseURL: "https://jtautoservices-metadata-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "jtautoservices-metadata",
+        storageBucket: "jtautoservices-metadata.firebasestorage.app",
+        messagingSenderId: "426427161628",
+        appId: "1:426427161628:web:22a0f220400cfc5c1a93d9"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
     document.getElementById('loginForm').addEventListener('submit', function(e) {
         e.preventDefault();
         
-        const user = document.getElementById('username').value;
+        const user = document.getElementById('username').value.trim();
         const pass = document.getElementById('password').value;
+        const msgElement = document.getElementById('message');
 
-        // Demonstration Logic
-        if (user === "admin" && pass === "020422") {
-            window.location.href = "main.html"; 
-        } else {
-            document.getElementById('message').innerText = "Access Denied. Check credentials.";
+        msgElement.style.color = "#58a6ff";
+        msgElement.innerText = "Connecting to secure database nodes...";
+
+        // Map 'admin' shortcut to your chosen master email address
+        let resolvedEmail = user;
+        if (user === "admin") {
+            resolvedEmail = "jepsipemalas@gmail.com"; 
         }
+
+        // Set local device persistence so you only have to log in once
+        setPersistence(auth, browserLocalPersistence)
+            .then(() => {
+                return signInWithEmailAndPassword(auth, resolvedEmail, pass);
+            })
+            .then((userCredential) => {
+                msgElement.style.color = "#2ea44f";
+                msgElement.innerText = "✓ Access Granted! Redirecting to dashboard...";
+                
+                setTimeout(() => {
+                    window.location.href = "main.html"; 
+                }, 800);
+            })
+            .catch((error) => {
+                console.error(error);
+                msgElement.style.color = "#ff6b6b";
+                
+                if (error.code === "auth/invalid-credential" || error.code === "auth/user-not-found") {
+                    msgElement.innerText = "Access Denied. Check credentials.";
+                } else {
+                    msgElement.innerText = "System Error: " + error.message;
+                }
+            });
     });
 </script>
 
