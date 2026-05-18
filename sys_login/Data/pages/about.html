@@ -1,76 +1,302 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ms">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About Us - JT Auto Services</title>
+    <title>JTS Boss Panel | Financial Analytics</title>
     <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f4f4f4; }
-        .container { max-width: 800px; margin: 50px auto; background: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .header { text-align: center; border-bottom: 2px solid #e74c3c; padding-bottom: 20px; margin-bottom: 30px; }
-        .logo { max-width: 200px; height: auto; margin-bottom: 15px; }
-        h1 { color: #2c3e50; margin: 10px 0; }
-        .ssm-no { font-size: 0.9em; color: #7f8c8d; }
-        .content { margin-bottom: 30px; }
-        .contact-info { background: #f9f9f9; padding: 20px; border-left: 5px solid #e74c3c; border-radius: 4px; margin-bottom: 30px; }
-        .contact-item { margin-bottom: 10px; display: flex; align-items: flex-start; }
-        .contact-label { font-weight: bold; width: 120px; flex-shrink: 0; }
+        :root {
+            --bg: #0b0e14;
+            --card: #161b22;
+            --accent: #58a6ff;
+            --text: #c9d1d9;
+            --text-dim: #8b949e;
+            --success: #2ea44f;
+            --danger: #ff4d4d;
+            --warning: #fbbf24;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+        }
+        .analytics-wrapper {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #30363d;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+        .header-logo { max-height: 50px; width: auto; object-fit: contain; }
+        h2, h3 { margin: 0; color: #fff; }
+        h2 span { color: var(--accent); }
+
+        /* KPI Cards Layout */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .kpi-card {
+            background: var(--card);
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        .kpi-card::before {
+            content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px;
+        }
+        .card-sales::before { background: var(--accent); }
+        .card-cash::before { background: var(--success); }
+        .card-debt::before { background: var(--danger); }
         
-        /* New Gallery Styles */
-        .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 20px; }
-        .gallery img { width: 100%; height: 150px; object-fit: cover; border-radius: 5px; border: 1px solid #ddd; }
+        .kpi-title { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); font-weight: bold; }
+        .kpi-value { font-size: 2rem; font-weight: bold; margin-top: 10px; color: #fff; }
         
-        .footer { text-align: center; margin-top: 30px; font-size: 0.8em; color: #95a5a6; }
-        a { color: #e74c3c; text-decoration: none; }
-        a:hover { text-decoration: underline; }
+        /* Tables Layout */
+        .data-section {
+            background: var(--card);
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: #0d1117; border-radius: 8px; overflow: hidden; }
+        table th, table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #30363d; font-size: 0.95rem; }
+        table th { background: #1f242c; color: var(--text-dim); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .debt-row:hover { background: #1c212a; }
+        .status-pill { padding: 3px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; }
+        .pill-danger { background: rgba(255, 77, 77, 0.15); color: var(--danger); border: 1px solid rgba(255, 77, 77, 0.3); }
+        
+        .btn { padding: 10px 20px; border: none; cursor: pointer; border-radius: 6px; font-weight: bold; background: #30363d; color: #fff; }
+        .btn:hover { background: var(--accent); color: #0b0e14; }
+
+        /* Print Settings Stylesheet Layout */
+        #print-report-pane { display: none; background: white; color: #333; padding: 40px; }
+        .print-table th { background: #f8f9fa !important; color: #333 !important; border: 1px solid #ddd !important; }
+        .print-table td { border: 1px solid #eee !important; color: #333 !important; }
+
+        @media print {
+            .no-print-area { display: none !important; }
+            #print-report-pane { display: block !important; }
+            body { background: white; padding: 0; }
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header">
-        <img src="images/logob.png" alt="JT Auto Services Logo" class="logo">
-        <h1>JT Auto Services</h1>
-        <p class="ssm-no">SSM Reg No: 202503349561 (JR0185602-V)</p>
+<div class="analytics-wrapper">
+    <!-- MASTER VISUAL DASHBOARD VIEW -->
+    <div class="no-print-area">
+        <div class="header-section">
+            <div>
+                <h2>JTS Boss Panel | <span>Financial Control</span></h2>
+                <p style="margin: 5px 0 0 0; color: var(--text-dim); font-size: 0.9rem;">Real-time workshop engine performance matrix</p>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <button class="btn" onclick="window.print()">🖨️ Export Financial PDF</button>
+                <img src="images/logow.png" alt="Logo" class="header-logo" onerror="this.style.display='none'">
+            </div>
+        </div>
+
+        <!-- KPI Financial Metrics Grid Blocks -->
+        <div class="kpi-grid">
+            <div class="kpi-card card-sales">
+                <div class="kpi-title">Jumlah Kasar Jualan (Total Sales)</div>
+                <div class="kpi-value">RM <span id="kpiGross">0.00</span></div>
+            </div>
+            <div class="kpi-card card-cash">
+                <div class="kpi-title">Tunai Di Tangan (Cash Collected)</div>
+                <div class="kpi-value" style="color: #56d364;">RM <span id="kpiCash">0.00</span></div>
+            </div>
+            <div class="kpi-card card-debt">
+                <div class="kpi-title">Baki Tertunggak (Total Debt Owed)</div>
+                <div class="kpi-value" style="color: #ff7b72;">RM <span id="kpiDebt">0.00</span></div>
+            </div>
+        </div>
+
+        <!-- Section List Table: Accounts Receivable Debtors -->
+        <div class="data-section">
+            <h3 style="color: var(--danger);">⚠️ Debt Tracker Watchlist (Senarai Pelanggan Belum Lunas)</h3>
+            <p style="font-size: 0.85rem; color: var(--text-dim); margin: 5px 0 15px 0;">Follow up directly with clients holding open balance statements</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Plate No</th>
+                        <th>Customer Name</th>
+                        <th>Contact Phone</th>
+                        <th>Last Service</th>
+                        <th>Total Invoice</th>
+                        <th>Amount Paid</th>
+                        <th>Owed Balance</th>
+                    </tr>
+                </thead>
+                <tbody id="debtorTableBody">
+                    <tr><td colspan="7" style="text-align:center; color:var(--text-dim);">Scanning live workshop ledger database rows...</td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
-    <div class="content">
-        <h2>About Us</h2>
-        <p>Welcome to <strong>JT Auto Services</strong>. Established in 2025, we are dedicated to providing top-tier automotive solutions and maintenance services in Dengkil. Our commitment is to ensure your vehicle performs at its best through professional expertise and reliable care.</p>
-    </div>
+    <!-- CLEAN HARDCOPY INK-FRIENDLY BALANCESHEET DESIGN PRINT OUT PREVIEW FRAME -->
+    <div id="print-report-pane">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:3px solid #333; padding-bottom:15px; margin-bottom:20px;">
+            <div>
+                <h2 style="color:#1a1a1a; margin:0;">JT Auto Services</h2>
+                <p style="font-size:12px; color:#555; margin:3px 0 0 0;">Workshop Financial Ledger Executive Audit Balance Report</p>
+            </div>
+            <img src="images/logob.png" style="max-height:65px; width:auto;" alt="Logo" onerror="this.style.display='none'">
+        </div>
 
-    <div class="contact-info">
-        <div class="contact-item">
-            <div class="contact-label">Location:</div>
-            <div>No. 12, Jalan Deluxe 2, Pusat Perdagangan Deluxe, 43800 Dengkil, Selangor</div>
+        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:15px; border:1px solid #ccc; padding:15px; border-radius:6px; margin-bottom:25px; background:#f8f9fa;">
+            <div>Total Booked Sales: <br><strong style="font-size:1.3em;">RM <span id="pGross">0.00</span></strong></div>
+            <div>Liquidity Cash Collected: <br><strong style="font-size:1.3em; color:green;">RM <span id="pCash">0.00</span></strong></div>
+            <div>Outstanding Receivables Ledger: <br><strong style="font-size:1.3em; color:red;">RM <span id="pDebt">0.00</span></strong></div>
         </div>
-        <div class="contact-item">
-            <div class="contact-label">Phone/WA:</div>
-            <div><a href="wa.me">+60 16-525 0890</a></div>
-        </div>
-        <div class="contact-item">
-            <div class="contact-label">Hours:</div>
-            <div>Mon - Sat: 9:00 AM - 6:00 PM</div>
-        </div>
-    </div>
 
-    <!-- Image Gallery Section -->
-    <div class="content">
-        <h2>Workshop Asset</h2>
-        <div class="gallery">
-            <!-- Replace 'image1.jpg' etc. with your actual photo filenames -->
-            <img src="Data/images/QR.jpeg" alt="QR Pay">
-            <img src="engine_service.jpg" alt="Engine Servicing">
-            <img src="brake_service.jpg" alt="Brake Maintenance">
-            <img src="diagnostic_tools.jpg" alt="Computer Diagnostics">
-            <img src="car_lift.jpg" alt="Vehicle Inspection">
+        <h3 style="color:#333; border-bottom:2px solid #ddd; padding-bottom:5px; text-transform:uppercase; font-size:14px; margin-bottom:10px;">Uncollected Outstanding Debtor Statement Accounts</h3>
+        <table class="print-table" style="width:100%; border-collapse:collapse;">
+            <thead>
+                <tr>
+                    <th style="padding:8px; border:1px solid #ddd;">Vehicle Plate</th>
+                    <th style="padding:8px; border:1px solid #ddd;">Client Name</th>
+                    <th style="padding:8px; border:1px solid #ddd;">Phone Contact</th>
+                    <th style="padding:8px; border:1px solid #ddd;">Invoice Date</th>
+                    <th style="padding:8px; border:1px solid #ddd; text-align:right;">Grand Total</th>
+                    <th style="padding:8px; border:1px solid #ddd; text-align:right;">Paid Deposit</th>
+                    <th style="padding:8px; border:1px solid #ddd; text-align:right;">Balance Due</th>
+                </tr>
+            </thead>
+            <tbody id="printDebtorTableBody"></tbody>
+        </table>
+        <div style="margin-top:30px; font-size:11px; text-align:center; color:#777; border-top:1px dashed #ccc; padding-top:10px;">
+            Confidential Internal Corporate Documents Generation Logged Automatically
         </div>
-    </div>
-
-    <div class="footer">
-        &copy; 2026 JT Auto Services. All rights reserved.
     </div>
 </div>
 
+<!-- FIREBASE CONNECTION INTERFACE ENGINE MODULE -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAOkSn53iUrBiHO-5wS1t4vcJwW46yAoqs",
+        authDomain: "jtautoservices-metadata.firebaseapp.com",
+        databaseURL: "https://jtautoservices-metadata-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "jtautoservices-metadata",
+        storageBucket: "jtautoservices-metadata.firebasestorage.app",
+        messagingSenderId: "426427161628",
+        appId: "1:426427161628:web:22a0f220400cfc5c1a93d9"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    async function loadBossFinancialAnalyticsEngine() {
+        const debtorTable = document.getElementById('debtorTableBody');
+        const printDebtorTable = document.getElementById('printDebtorTableBody');
+        
+        try {
+            const snapshot = await get(ref(db, 'serviceRecords'));
+            if(snapshot.exists()) {
+                let cumulativeGross = 0;
+                let cumulativeCash = 0;
+                let cumulativeDebt = 0;
+                
+                let dashboardTableHTML = "";
+                let printableTableHTML = "";
+
+                const records = snapshot.val();
+                
+                // Traverse database records
+                for (const plateKey in records) {
+                    const data = records[plateKey];
+                    const fin = data.financials || { totalDebitAmount: 0, depositCreditAmount: 0, outstandingBalanceDue: 0 };
+                    
+                    const totalBill = parseFloat(fin.totalDebitAmount) || 0;
+                    const amountPaid = parseFloat(fin.depositCreditAmount) || 0;
+                    const balanceOwed = parseFloat(fin.outstandingBalanceDue) || 0;
+
+                    // Compute master metrics calculations
+                    cumulativeGross += totalBill;
+                    cumulativeCash += amountPaid;
+                    cumulativeDebt += balanceOwed;
+
+                    // If money is still owed, dump customer entry rows directly into the watchlist arrays
+                    if (balanceOwed > 0) {
+                        const rawDate = data.lastService || "-";
+                        let explicitFormattedDate = rawDate;
+                        if(rawDate.includes("-")) {
+                            const split = rawDate.split("-");
+                            explicitFormattedDate = `${split[2]}/${split[1]}/${split[0]}`;
+                        }
+
+                        dashboardTableHTML += `
+                            <tr class="debt-row">
+                                <td style="font-weight:bold; color:var(--accent);">${plateKey.toUpperCase()}</td>
+                                <td>${data.customerName || 'N/A'}</td>
+                                <td><a href="tel:${data.custPhone}" style="color:inherit; text-decoration:none;">📞 ${data.custPhone || '-'}</a></td>
+                                <td style="font-size:0.85rem; color:var(--text-dim);">${explicitFormattedDate}</td>
+                                <td>RM ${totalBill.toFixed(2)}</td>
+                                <td style="color:var(--success);">RM ${amountPaid.toFixed(2)}</td>
+                                <td style="color:var(--danger); font-weight:bold;">RM ${balanceOwed.toFixed(2)}</td>
+                            </tr>
+                        `;
+
+                        printableTableHTML += `
+                            <tr>
+                                <td style="padding:6px; border:1px solid #ddd; font-weight:bold;">${plateKey.toUpperCase()}</td>
+                                <td style="padding:6px; border:1px solid #ddd;">${data.customerName || 'N/A'}</td>
+                                <td style="padding:6px; border:1px solid #ddd;">${data.custPhone || '-'}</td>
+                                <td style="padding:6px; border:1px solid #ddd; font-size:12px;">${explicitFormattedDate}</td>
+                                <td style="padding:6px; border:1px solid #ddd; text-align:right;">RM ${totalBill.toFixed(2)}</td>
+                                <td style="padding:6px; border:1px solid #ddd; text-align:right; color:green;">RM ${amountPaid.toFixed(2)}</td>
+                                <td style="padding:6px; border:1px solid #ddd; text-align:right; color:red; font-weight:bold;">RM ${balanceOwed.toFixed(2)}</td>
+                            </tr>
+                        `;
+                    }
+                }
+
+                // Render metrics to visual layout elements
+                document.getElementById('kpiGross').innerText = cumulativeGross.toFixed(2);
+                document.getElementById('kpiCash').innerText = cumulativeCash.toFixed(2);
+                document.getElementById('kpiDebt').innerText = cumulativeDebt.toFixed(2);
+
+                // Render metrics to hardcopy spreadsheet print layouts
+                document.getElementById('pGross').innerText = cumulativeGross.toFixed(2);
+                document.getElementById('pCash').innerText = cumulativeCash.toFixed(2);
+                document.getElementById('pDebt').innerText = cumulativeDebt.toFixed(2);
+
+                // Render loops
+                debtorTable.innerHTML = dashboardTableHTML || `<tr><td colspan="7" style="text-align:center; color:var(--success); font-weight:bold;">🎉 All Clean! No outstanding customer debt detected!</td></tr>`;
+                printDebtorTable.innerHTML = printableTableHTML || `<tr><td colspan="7" style="text-align:center; padding:10px;">No outstanding customer balance accounts.</td></tr>`;
+
+            } else {
+                debtorTable.innerHTML = `<tr><td colspan="7" style="text-align:center;">No warehouse database data structural roots found.</td></tr>`;
+            }
+        } catch (error) {
+            console.error(error);
+            debtorTable.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--danger);">Exception error connecting to nodes: ${error.message}</td></tr>`;
+        }
+    }
+
+    window.onload = () => {
+        loadBossFinancialAnalyticsEngine();
+    };
+</script>
 </body>
 </html>
