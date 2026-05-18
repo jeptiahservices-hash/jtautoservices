@@ -28,7 +28,7 @@
         .logo-container { display: flex; align-items: center; }
         .logo-container img { height: 50px; margin-right: 15px; }
         .company-name { font-size: 24px; font-weight: bold; letter-spacing: 1px; }
-        .contact-info { font-size: 14px; color: #b0b0b0; }
+        .contact-info { font-size: 14px; color: #b0b0b0; display: flex; align-items: center; gap: 15px; }
 
         /* Navigation Styling */
         nav { 
@@ -51,7 +51,7 @@
             transition: all 0.3s ease;
         }
 
-        nav button:hover { 
+        nav button:hover, nav button.active { 
             background-color: #007bff; /* Corporate blue from login page */
             color: white;
             border-color: #007bff;
@@ -73,10 +73,12 @@
             color: #ff6b6b;
             text-decoration: none;
             font-size: 14px;
-            margin-left: 20px;
             border: 1px solid #ff6b6b;
             padding: 5px 12px;
             border-radius: 4px;
+            cursor: pointer;
+            background: transparent;
+            font-weight: bold;
         }
         .logout-link:hover {
             background: #ff6b6b;
@@ -88,32 +90,77 @@
 
     <header>
         <div class="logo-container">
-            <img src="Data/images/logo.png" alt="JT Auto Services Logo"> 
+            <img src="Data/images/logo.png" alt="JT Auto Services Logo" onerror="this.src='images/logow.png'"> 
             <div class="company-name">JT Auto Services</div>
         </div>
         <div class="contact-info">
             Contact: (+60) 16-5250890
-            <a href="login.html" class="logout-link">Logout</a>
+            <!-- Changed to an actual clickable trigger button for true Firebase session logout -->
+            <button id="logoutBtn" class="logout-link">Logout</button>
         </div>
     </header>
 
-    <nav>
-        <button onclick="changePage('Data/pages/billgen.html')">Bill Generator</button>
-        <button onclick="changePage('Data/pages/worksumery.html')">Work Report</button>
-        <button onclick="changePage('Data/pages/records.html')">$ Records</button>
-        <button onclick="changePage('Data/pages/oders.html')">Customer Oder</button>
-        <button onclick="changePage('Data/pages/market-admin.html')">Market Admin</button>
-        <button onclick="changePage('Data/pages/mycar-admin.html')">MyCar Admin</button>
-        <button onclick="changePage('Data/pages/about.html')">About Us</button>
+    <nav id="navBarTabs">
+        <!-- UPDATED: Pointing to your optimized Admin Pro and Analytics files -->
+        <button class="active" onclick="changePage('admin-pro.html', this)">🛠️ JTS Admin Pro</button>
+        <button onclick="changePage('analytics.html', this)">📈 Boss Analytics</button>
+        <button onclick="changePage('viewer.html', this)">🚙 Customer Viewer</button>
+        
+        <!-- Keeping your placeholders -->
+        <button onclick="changePage('Data/pages/oders.html', this)">Customer Order</button>
+        <button onclick="changePage('Data/pages/market-admin.html', this)">Market Admin</button>
+        <button onclick="changePage('Data/pages/mycar-admin.html', this)">MyCar Admin</button>
+        <button onclick="changePage('Data/pages/about.html', this)">About Us</button>
     </nav>
 
-    <iframe id="main-view" src="Data/images/service.png" width="100%" height="1500px"></iframe>
+    <!-- Switched default landing preview src to admin-pro.html so it loads up instantly -->
+    <iframe id="main-view" src="admin-pro.html" width="100%" height="1500px"></iframe>
 
-    <script>
-        // Smoothly change the iframe source
-        function changePage(pageUrl) {
+    <!-- FIREBASE AND FRAME RUNTIME MANAGER ENGINE -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAOkSn53iUrBiHO-5wS1t4vcJwW46yAoqs",
+            authDomain: "jtautoservices-metadata.firebaseapp.com",
+            databaseURL: "https://jtautoservices-metadata-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "jtautoservices-metadata",
+            storageBucket: "jtautoservices-metadata.firebasestorage.app",
+            messagingSenderId: "426427161628",
+            appId: "1:426427161628:web:22a0f220400cfc5c1a93d9"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // 1. Live Authenticated Session Observer Gatekeeper
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                console.log("No active user session key found. Shielding layout access...");
+                window.location.href = "login.html"; // Kicks back to login page if unauthenticated
+            } else {
+                console.log("Secure access cleared for supervisor:", user.email);
+            }
+        });
+
+        // 2. Clear Session Token on Logout Trigger click
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            signOut(auth).then(() => {
+                window.location.href = "login.html";
+            }).catch(err => alert("Logout Exception: " + err.message));
+        });
+
+        // 3. Page Switching Routine with dynamic active tab indicator highlighting
+        window.changePage = function(pageUrl, currentButton) {
             document.getElementById('main-view').src = pageUrl;
-        }
+            
+            if (currentButton) {
+                const buttons = document.querySelectorAll('#navBarTabs button');
+                buttons.forEach(btn => btn.classList.remove('active'));
+                currentButton.classList.add('active');
+            }
+        };
     </script>
 
 </body>
