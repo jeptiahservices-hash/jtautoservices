@@ -246,9 +246,9 @@
         inputCard.innerHTML = `
             <div style="display:grid; grid-template-columns: 2fr 1fr; gap:10px; margin-bottom: 8px;">
                 <div>
-                    <label style="font-size:11px; font-weight:bold; color:#b0b0b0;">TANGKAP/PILIH GAMBAR:</label>
-                    <!-- capture="camera" membolehkan peranti telefon membuka kamera secara direct -->
-                    <input type="file" accept="image/*" capture="camera" onchange="processImage(this, '${currentId}')">
+                    <label style="font-size:11px; font-weight:bold; color:#b0b0b0;">AMBIL GAMBAR / PILIH GALERI:</label>
+                    <!-- Menghapuskan capture="camera" membolehkan peranti menawarkan pilihan Galeri atau Kamera -->
+                    <input type="file" accept="image/*" onchange="processImage(this, '${currentId}')">
                 </div>
                 <div>
                     <label style="font-size:11px; font-weight:bold; color:#b0b0b0;">SAIZ PAPARAN:</label>
@@ -382,7 +382,6 @@
         window.addEventListener('touchend', endDraw);
 
         function saveToPreview() {
-            // Tukar warna garisan kepada hitam sebelum hantar ke halaman cetak putih
             const tempCanvas = document.createElement('canvas');
             tempCanvas.width = canvas.width;
             tempCanvas.height = canvas.height;
@@ -392,7 +391,6 @@
             tempCtx.strokeStyle = "#000000"; // Tandatangan hitam pada kertas cetak putih
             tempCtx.drawImage(canvas, 0, 0);
             
-            // Proses manipulasi piksel warna pen putih di skrin tukar ke hitam di PDF
             const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             const data = imgData.data;
             tempCtx.clearRect(0,0, canvas.width, canvas.height);
