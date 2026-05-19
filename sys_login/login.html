@@ -3,162 +3,206 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JTS Corporate Login</title>
+    <title>JT Auto Services - Management Workspace</title>
     <style>
-        /* Modern Dark Theme Styling */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #121212; /* Deep charcoal background */
-            color: #e0e0e0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
+        :root {
+            --bg: #121212;
+            --card: #1e1e1e;
+            --nav-bg: #181818;
+            --accent: #007bff;
+            --text: #e0e0e0;
+            --text-dim: #b0b0b0;
+            --danger: #ff6b6b;
+            --success: #2ea44f;
         }
 
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; padding: 0; 
+            background-color: var(--bg); color: var(--text);
+            height: 100vh; display: flex; flex-direction: column;
+        }
+
+        /* --- 1. LOGIN SCREEN STYLING (Hidden after login) --- */
+        #login-overlay {
+            position: fixed; top:0; left:0; width:100vw; height:100vh;
+            background-color: var(--bg); display: flex; justify-content: center;
+            align-items: center; z-index: 9999;
+        }
         .login-card {
-            background-color: #1e1e1e; /* Slightly lighter card background */
-            padding: 2.5rem;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            width: 350px;
-            text-align: center;
-            border: 1px solid #333;
+            background-color: var(--card); padding: 2.5rem; border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); width: 350px; text-align: center; border: 1px solid #333;
         }
+        .company-logo { width: 220px; height: auto; margin-bottom: 1.5rem; object-fit: contain; }
+        .login-card h2 { margin-bottom: 1.5rem; font-weight: 300; letter-spacing: 1px; }
+        .login-card input {
+            width: 100%; padding: 12px; margin: 8px 0; background-color: #2c2c2c;
+            border: 1px solid #444; border-radius: 6px; color: #ffffff; box-sizing: border-box;
+        }
+        .login-card input:focus { outline: none; border-color: var(--accent); }
+        .login-card button {
+            width: 100%; padding: 12px; margin-top: 1rem; background-color: var(--accent);
+            color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;
+        }
+        .login-card button:hover { background-color: #0056b3; }
+        #message { color: var(--danger); font-size: 14px; margin-top: 1rem; min-height: 20px; }
 
-        /* Logo Styling */
-        .company-logo {
-            width: 220px; /* Adjust size as needed */
-            height: auto;
-            margin-bottom: 1.5rem;
-            object-fit: contain;
+        /* --- 2. MAIN DASHBOARD STYLING (Hidden before login) --- */
+        #dashboard-view { display: none; flex-direction: column; height: 100vh; width: 100%; }
+        header {
+            background-color: var(--card); color: white; padding: 15px 30px;
+            display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #333;
         }
-
-        h2 {
-            margin-bottom: 1.5rem;
-            font-weight: 300;
-            letter-spacing: 1px;
+        .logo-container { display: flex; align-items: center; }
+        .logo-container img { height: 50px; margin-right: 15px; }
+        .company-name { font-size: 24px; font-weight: bold; letter-spacing: 1px; }
+        .contact-info { font-size: 14px; color: var(--text-dim); display: flex; align-items: center; gap: 15px; }
+        
+        nav { background: var(--nav-bg); padding: 12px; text-align: center; border-bottom: 1px solid #333; }
+        nav button { 
+            padding: 10px 20px; margin: 5px; cursor: pointer; background-color: #2c2c2c;
+            color: var(--text); border: 1px solid #444; border-radius: 6px; font-weight: 500; transition: all 0.3s ease;
         }
-
-        input {
-            width: 100%;
-            padding: 12px;
-            margin: 8px 0;
-            background-color: #2c2c2c;
-            border: 1px solid #444;
-            border-radius: 6px;
-            color: #ffffff;
-            box-sizing: border-box;
-            transition: border 0.3s;
+        nav button:hover, nav button.active { background-color: var(--accent); color: white; border-color: var(--accent); }
+        
+        iframe { border: none; background-color: var(--bg); flex-grow: 1; width: 100%; }
+        
+        .logout-link {
+            color: var(--danger); text-decoration: none; font-size: 14px; border: 1px solid var(--danger);
+            padding: 5px 12px; border-radius: 4px; cursor: pointer; background: transparent; font-weight: bold;
         }
-
-        input:focus {
-            outline: none;
-            border-color: #007bff;
-        }
-
-        button {
-            width: 100%;
-            padding: 12px;
-            margin-top: 1rem;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        button:hover {
-            background-color: #0056b3;
-        }
-
-        #message {
-            color: #ff6b6b;
-            font-size: 14px;
-            margin-top: 1rem;
-            min-height: 20px;
-        }
+        .logout-link:hover { background: var(--danger); color: white; }
     </style>
 </head>
 <body>
 
-<div class="login-card">
-    <!-- YOUR ORIGINAL BRANDING LOGO -->
-    <img src="Data/images/logo.png" alt="Company Logo" class="company-logo" onerror="this.src='images/logow.png'">
-    
-    <h2>JTS Admin Tools</h2>
-    
-    <form id="loginForm">
-        <input type="text" id="username" placeholder="Username" required>
-        <input type="password" id="password" placeholder="Password" required>
-        <button type="submit">Access System</button>
-    </form>
-    
-    <p id="message"></p>
-</div>
+    <!-- STAGE 1: LOCKDOWN LOGIN OVERLAY -->
+    <div id="login-overlay">
+        <div class="login-card">
+            <img src="Data/images/logo.png" alt="Company Logo" class="company-logo" onerror="this.src='images/logow.png'">
+            <h2>JTS Admin Tools</h2>
+            <form id="loginForm">
+                <input type="text" id="username" placeholder="Username" required>
+                <input type="password" id="password" placeholder="Password" required>
+                <button type="submit">Access System</button>
+            </form>
+            <p id="message"></p>
+        </div>
+    </div>
 
-<!-- SECURE FIREBASE ENGINE LOGIC -->
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, setPersistence, browserLocalPersistence, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    <!-- STAGE 2: CONTROL WORKSPACE (Unlocked strictly on authenticated state validation) -->
+    <div id="dashboard-view">
+        <header>
+            <div class="logo-container">
+                <img src="Data/images/logo.png" alt="JT Auto Services Logo" onerror="this.src='images/logow.png'"> 
+                <div class="company-name">JT Auto Services</div>
+            </div>
+            <div class="contact-info">
+                Contact: (+60) 16-5250890
+                <button id="logoutBtn" class="logout-link">Logout</button>
+            </div>
+        </header>
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyAOkSn53iUrBiHO-5wS1t4vcJwW46yAoqs",
-        authDomain: "jtautoservices-metadata.firebaseapp.com",
-        databaseURL: "https://jtautoservices-metadata-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "jtautoservices-metadata",
-        storageBucket: "jtautoservices-metadata.firebasestorage.app",
-        messagingSenderId: "426427161628",
-        appId: "1:426427161628:web:22a0f220400cfc5c1a93d9"
-    };
+        <nav id="navBarTabs">
+            <button class="active" onclick="changePage('Data/pages/billgen.html', this)">🛠️ JTS Admin Pro</button>
+            <button onclick="changePage('Date/pages/about.html', this)">📈 Boss Analytics</button>
+            <button onclick="changePage('viewer.html', this)">🚙 Customer Viewer</button>
+            <button onclick="changePage('Data/pages/oders.html', this)">Customer Order</button>
+            <button onclick="changePage('Data/pages/market-admin.html', this)">Market Admin</button>
+            <button onclick="changePage('Data/pages/mycar-admin.html', this)">MyCar Admin</button>
+            <button onclick="changePage('Data/pages/about.html', this)">About Us</button>
+        </nav>
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+        <iframe id="main-view" src="Data/pages/billgen.html"></iframe>
+    </div>
 
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const user = document.getElementById('username').value.trim();
-        const pass = document.getElementById('password').value;
+    <!-- CENTRALIZED CORE ARCHITECTURE MODULE SCRIPT -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAOkSn53iUrBiHO-5wS1t4vcJwW46yAoqs",
+            authDomain: "jtautoservices-metadata.firebaseapp.com",
+            databaseURL: "https://jtautoservices-metadata-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "jtautoservices-metadata",
+            storageBucket: "jtautoservices-metadata.firebasestorage.app",
+            messagingSenderId: "426427161628",
+            appId: "1:426427161628:web:22a0f220400cfc5c1a93d9"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        const loginOverlay = document.getElementById('login-overlay');
+        const dashboardView = document.getElementById('dashboard-view');
         const msgElement = document.getElementById('message');
 
-        msgElement.style.color = "#58a6ff";
-        msgElement.innerText = "Connecting to secure database nodes...";
+        // 1. Core Gatekeeper: Monitor auth state continuously
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                console.log("Session verified for user:", user.email);
+                loginOverlay.style.display = 'none'; // Dismiss login wrapper
+                dashboardView.style.display = 'flex'; // Display the full app
+            } else {
+                console.log("No valid session token. Halting view access.");
+                dashboardView.style.display = 'none';
+                loginOverlay.style.display = 'flex';
+            }
+        });
 
-        // Map 'admin' shortcut to your chosen master email address
-        let resolvedEmail = user;
-        if (user === "admin") {
-            resolvedEmail = "jepsipemalas@gmail.com"; 
-        }
+        // 2. Intercept Login Submission & Authenticate with Firebase
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const user = document.getElementById('username').value.trim();
+            const pass = document.getElementById('password').value;
 
-        // Set local device persistence so you only have to log in once
-        setPersistence(auth, browserLocalPersistence)
-            .then(() => {
-                return signInWithEmailAndPassword(auth, resolvedEmail, pass);
-            })
-            .then((userCredential) => {
-                msgElement.style.color = "#2ea44f";
-                msgElement.innerText = "✓ Access Granted! Redirecting to dashboard...";
-                
-                setTimeout(() => {
-                    window.location.href = "main.html"; 
-                }, 800);
-            })
-            .catch((error) => {
-                console.error(error);
-                msgElement.style.color = "#ff6b6b";
-                
-                if (error.code === "auth/invalid-credential" || error.code === "auth/user-not-found") {
-                    msgElement.innerText = "Access Denied. Check credentials.";
-                } else {
-                    msgElement.innerText = "System Error: " + error.message;
-                }
+            msgElement.style.color = "#58a6ff";
+            msgElement.innerText = "Connecting to secure JTS server nodes...";
+
+            let resolvedEmail = user;
+            if (user === "admin") {
+                resolvedEmail = "jepsipemalas@gmail.com"; 
+            }
+
+            setPersistence(auth, browserLocalPersistence)
+                .then(() => {
+                    return signInWithEmailAndPassword(auth, resolvedEmail, pass);
+                })
+                .then(() => {
+                    msgElement.style.color = "#2ea44f";
+                    msgElement.innerText = "✓ Access Granted! Syncing workspace...";
+                })
+                .catch((error) => {
+                    console.error(error);
+                    msgElement.style.color = "var(--danger)";
+                    if (error.code === "auth/invalid-credential" || error.code === "auth/user-not-found") {
+                        msgElement.innerText = "Access Denied. Check credentials.";
+                    } else {
+                        msgElement.innerText = "System error connection: " + error.message;
+                    }
+                });
+        });
+
+        // 3. Clear Login Tokens cleanly on click
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            signOut(auth).then(() => {
+                msgElement.innerText = "";
+                location.reload();
             });
-    });
-</script>
+        });
 
+        // 4. Standalone page swapper navigation route logic
+        window.changePage = function(pageUrl, currentButton) {
+            document.getElementById('main-view').src = pageUrl;
+            
+            if (currentButton) {
+                const buttons = document.querySelectorAll('#navBarTabs button');
+                buttons.forEach(btn => btn.classList.remove('active'));
+                currentButton.classList.add('active');
+            }
+        };
+    </script>
 </body>
 </html>
