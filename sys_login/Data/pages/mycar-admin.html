@@ -1,172 +1,346 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ms">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JTS Admin | Service Entry</title>
+    <title>JTS Admin | Core Data Manager</title>
     <style>
         :root {
             --bg: #0b0e14;
             --card: #161b22;
             --accent: #58a6ff;
             --text: #c9d1d9;
+            --text-dim: #8b949e;
             --success: #238636;
+            --danger: #dc3545;
+            --warning: #fbbf24;
         }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .form-card { background: var(--card); padding: 25px; border-radius: 12px; width: 100%; max-width: 600px; border: 1px solid #30363d; }
-        h2 { color: var(--accent); margin-top: 0; }
-        .input-group { margin-bottom: 15px; }
-        label { display: block; font-size: 0.85rem; margin-bottom: 5px; color: #8b949e; }
-        input, textarea { width: 100%; padding: 10px; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: white; box-sizing: border-box; }
-        .parts-container { background: #0d1117; padding: 10px; border-radius: 6px; border: 1px solid #30363d; }
-        .part-row { display: flex; gap: 5px; margin-bottom: 5px; }
-        .btn { background: var(--accent); color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
-        .btn-add { background: #30363d; font-size: 0.8rem; width: auto; padding: 5px 10px; }
-        .btn-save { background: var(--success); font-size: 1.1rem; margin-top: 25px; }
-        .nav-links { margin-top: 20px; }
-        .nav-links a { color: var(--accent); text-decoration: none; font-size: 0.9rem; }
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: var(--bg); 
+            color: var(--text); 
+            padding: 20px; 
+            margin: 0;
+        }
+        .manager-wrapper { max-width: 900px; margin: 0 auto; }
+        .card { 
+            background: var(--card); padding: 25px; border-radius: 12px; 
+            border: 1px solid #30363d; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+        }
+        h2 { color: var(--accent); margin-top: 0; border-bottom: 1px solid #30363d; padding-bottom: 10px; }
+        h3 { color: #fff; margin-top: 0; border-bottom: 1px solid #30363d; padding-bottom: 8px; }
+        
+        .search-box { display: flex; gap: 10px; margin-bottom: 10px; }
+        .search-box input { flex-grow: 1; text-transform: uppercase; font-size: 1.1rem; font-weight: bold; letter-spacing: 1px;}
+        
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 15px; }
+        .field-group { margin-bottom: 12px; }
+        label { display: block; font-size: 0.85rem; margin-bottom: 5px; color: var(--text-dim); font-weight: bold; }
+        
+        input, select, textarea { 
+            width: 100%; padding: 10px; background: #0d1117; 
+            border: 1px solid #30363d; border-radius: 6px; color: white; 
+            box-sizing: border-box; font-size: 0.95rem;
+        }
+        input:focus, select:focus, textarea:focus { border-color: var(--accent); outline: none; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; background: #0d1117; border-radius: 6px; overflow: hidden; }
+        table th, table td { border: 1px solid #30363d; padding: 10px; text-align: left; }
+        table th { background: #1f242c; font-size: 0.85rem; color: var(--text-dim); }
+
+        .btn { padding: 12px 20px; border: none; cursor: pointer; border-radius: 6px; font-weight: bold; font-size: 0.95rem; }
+        .btn-accent { background: var(--accent); color: #0b0e14; }
+        .btn-success { background: var(--success); color: white; width: 100%; font-size: 1.1rem; padding: 15px; margin-top: 10px; }
+        .btn-danger { background: var(--danger); color: white; padding: 6px 12px; font-size: 0.85rem; }
+        
+        #editor-container { display: none; }
+        #auth-status { font-size: 0.85rem; font-weight: bold; text-align: right; margin-bottom: 15px; }
     </style>
 </head>
 <body>
 
-    <div class="form-card">
-        <h2>🚗 New Service Record</h2>
-        
-        <div class="input-group">
-            <label>Plate Number (e.g. WVG1234)</label>
-            <input type="text" id="plate" placeholder="ENTER PLATE" style="text-transform: uppercase;">
+<div class="manager-wrapper">
+    <div id="auth-status" style="color: #8b949e;">Checking authentication state...</div>
+    <h2>🗄️ Central Database Record Editor</h2>
+    
+    <!-- STEP 1: TARGET RECORD SEARCH BAR -->
+    <div class="card">
+        <label>Masukkan No. Plate Kenderaan Untuk Diubah (Search Plate)</label>
+        <div class="search-box">
+            <input type="text" id="searchPlate" placeholder="Cth: JXB2663">
+            <button class="btn btn-accent" onclick="fetchRecordFromFirebase()">🔍 Load Data</button>
         </div>
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-            <div class="input-group">
-                <label>Customer Name</label>
-                <input type="text" id="custName">
-            </div>
-            <div class="input-group">
-                <label>Car Model</label>
-                <input type="text" id="carModel">
-            </div>
-        </div>
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-            <div class="input-group">
-                <label>Service Date</label>
-                <input type="date" id="serviceDate">
-            </div>
-            <div class="input-group">
-                <label>Mileage (KM)</label>
-                <input type="text" id="mileage">
-            </div>
-        </div>
-
-        <div class="input-group">
-            <label>Items Replaced</label>
-            <div id="partsList" class="parts-container">
-                <div class="part-row"><input type="text" class="part-item" placeholder="e.g. Engine Oil 5W30"></div>
-            </div>
-            <button class="btn btn-add" type="button" onclick="addPartRow()">+ Add Another Item</button>
-        </div>
-
-        <div class="input-group">
-            <label>Car Photo URL</label>
-            <input type="text" id="imgUrl" placeholder="Link to image">
-        </div>
-
-        <div class="input-group">
-            <label>PDF Invoice URL</label>
-            <input type="text" id="pdfUrl" placeholder="Link to PDF">
-        </div>
-
-        <div class="input-group">
-            <label>Additional Remarks</label>
-            <textarea id="remarks" rows="3"></textarea>
-        </div>
-
-        <div class="input-group">
-            <label>Next Service Suggestion</label>
-            <input type="text" id="nextService" placeholder="e.g. Nov 2024 or 90,000 KM">
-        </div>
-
-        <button class="btn btn-save" type="button" onclick="saveRecord()">🚀 Save to Firebase</button>
     </div>
 
-    <div class="nav-links">
-        <a href="index.html">← Back to Shop</a>
+    <!-- STEP 2: DYNAMIC EDITOR COMPONENT FRAME (Hidden until data loads) -->
+    <div id="editor-container">
+        <!-- Part A: Customer Profile Information -->
+        <div class="card">
+            <h3>📋 Profil Pelanggan & Kenderaan</h3>
+            <div class="grid-2">
+                <div class="field-group">
+                    <label>Nama Pelanggan</label>
+                    <input type="text" id="mCustName">
+                </div>
+                <div class="field-group">
+                    <label>No. Telefon</label>
+                    <input type="text" id="mCustPhone">
+                </div>
+            </div>
+            <div class="grid-3">
+                <div class="field-group">
+                    <label>Model Kenderaan</label>
+                    <input type="text" id="mCarModel">
+                </div>
+                <div class="field-group">
+                    <label>Mileage Semasa (KM)</label>
+                    <input type="text" id="mMileage">
+                </div>
+                <div class="field-group">
+                    <label>Tarikh Servis</label>
+                    <input type="date" id="mServiceDate">
+                </div>
+            </div>
+        </div>
+
+        <!-- Part B: Ledger Item Diagnostics Breakdowns -->
+        <div class="card">
+            <h3>💰 Senarai Barang & Harga Invois (Ledger Items)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Item Keterangan</th>
+                        <th width="80">Qty</th>
+                        <th width="140">Harga Seunit (RM)</th>
+                        <th width="60">Buang</th>
+                    </tr>
+                </thead>
+                <tbody id="mBillingRows"></tbody>
+            </table>
+            <button class="btn" style="margin-top: 10px; background: #30363d; color: #fff;" onclick="addEditorRow()">+ Tambah Item Invois</button>
+        </div>
+
+        <!-- Part C: Financial Accounting Balances Workflow -->
+        <div class="card">
+            <h3>📈 Imbangan Kewangan & Rekomendasi</h3>
+            <div class="grid-3">
+                <div class="field-group">
+                    <label>Jumlah Besar Asal (RM)</label>
+                    <input type="number" id="mTotalDebit" step="0.01" readonly style="opacity: 0.6; background: #1f242c;">
+                </div>
+                <div class="field-group">
+                    <label>Jumlah Telah Dibayar (RM)</label>
+                    <input type="number" id="mDepositCredit" step="0.01" oninput="recalculateEditorFinancials()">
+                </div>
+                <div class="field-group">
+                    <label>Baki Akhir Terkini (RM)</label>
+                    <input type="number" id="mBalanceDue" step="0.01" readonly style="opacity: 0.6; background: #1f242c;">
+                </div>
+            </div>
+            <div class="grid-2">
+                <div class="field-group">
+                    <label>Kaedah Pembayaran</label>
+                    <select id="mPayMethod">
+                        <option value="Tunai (Cash)">Tunai (Cash)</option>
+                        <option value="Perbankan Dalam Talian (Online Banking)">Perbankan Dalam Talian (Online Banking)</option>
+                        <option value="QR Pay (QR Code)">QR Pay (QR Code)</option>
+                    </select>
+                </div>
+                <div class="field-group">
+                    <label>Rekomendasi Servis Akan Datang</label>
+                    <input type="text" id="mNextService">
+                </div>
+            </div>
+            <div class="field-group">
+                <label>Car Photo Reference URL</label>
+                <input type="text" id="mCarImgUrl">
+            </div>
+
+            <!-- COMMIT COMMAND BUTTONS -->
+            <button class="btn btn-success" onclick="updateRecordInFirebase()">💾 Kemaskini & Simpan Rekod Live (Update)</button>
+        </div>
     </div>
+</div>
 
-    <script type="module">
-        // 1. All Imports at the very top
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+<!-- FIREBASE CONNECTION INTERFACE ENGINE MODULE -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // 2. Firebase Config
-        const firebaseConfig = {
-            apiKey: "AIzaSyAOkSn53iUrBiHO-5wS1t4vcJwW46yAoqs",
-            authDomain: "jtautoservices-metadata.firebaseapp.com",
-            databaseURL: "https://jtautoservices-metadata-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "jtautoservices-metadata",
-            storageBucket: "jtautoservices-metadata.firebasestorage.app",
-            messagingSenderId: "426427161628",
-            appId: "1:426427161628:web:22a0f220400cfc5c1a93d9"
-        };
+    const firebaseConfig = {
+        apiKey: "AIzaSyAOkSn53iUrBiHO-5wS1t4vcJwW46yAoqs",
+        authDomain: "jtautoservices-metadata.firebaseapp.com",
+        databaseURL: "https://jtautoservices-metadata-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "jtautoservices-metadata",
+        storageBucket: "jtautoservices-metadata.firebasestorage.app",
+        messagingSenderId: "426427161628",
+        appId: "1:426427161628:web:22a0f220400cfc5c1a93d9"
+    };
 
-        // 3. Initialize
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-        const auth = getAuth(app);
+    const app = initializeApp(firebaseConfig);
+    const localDb = getDatabase(app);
+    const auth = getAuth(app);
 
-        // 4. Security Observer
-        onAuthStateChanged(auth, (user) => {
-            if (!user) {
-                console.log("Not logged in, redirecting...");
-                window.location.href = "login.html"; 
+    let activeRecordSignatures = {}; // Preserve base64 image strings safely on read-write loops
+
+    function getActiveDatabase() {
+        if (window.parent && window.parent.firebaseDbInstance) {
+            return window.parent.firebaseDbInstance;
+        }
+        return localDb;
+    }
+
+    onAuthStateChanged(auth, (user) => {
+        const statusDiv = document.getElementById('auth-status');
+        if (user || (window.parent && window.parent.firebaseDbInstance)) {
+            statusDiv.style.color = "#56d364";
+            statusDiv.innerText = "✓ Database Editor Unlocked via Master Session";
+        } else {
+            statusDiv.style.color = "#ff6b6b";
+            statusDiv.innerText = "⚠️ Standalone Mode (Read Only Mode Active)";
+        }
+    });
+
+    // FETCH TARGET LOG ENGINE
+    window.fetchRecordFromFirebase = async function() {
+        const plate = document.getElementById('searchPlate').value.trim().toUpperCase();
+        if(!plate) return alert("Sila masukkan no plate kenderaan!");
+
+        const db = getActiveDatabase();
+        try {
+            const snapshot = await get(ref(db, 'serviceRecords/' + plate));
+            if(snapshot.exists()) {
+                const data = snapshot.val();
+                
+                // Map profile attributes straight to inputs
+                document.getElementById('mCustName').value = data.customerName || "";
+                document.getElementById('mCustPhone').value = data.custPhone || "";
+                document.getElementById('mCarModel').value = data.cardetails || "";
+                document.getElementById('mMileage').value = data.mileage || "";
+                document.getElementById('mServiceDate').value = data.lastService || "";
+                document.getElementById('mNextService').value = data.nextService || "";
+                document.getElementById('mCarImgUrl').value = data.carImage || "";
+
+                const fin = data.financials || { totalDebitAmount: 0, depositCreditAmount: 0, outstandingBalanceDue: 0, paymentMethodUsed: "Tunai (Cash)" };
+                document.getElementById('mTotalDebit').value = (fin.totalDebitAmount || 0).toFixed(2);
+                document.getElementById('mDepositCredit').value = (fin.depositCreditAmount || 0).toFixed(2);
+                document.getElementById('mBalanceDue').value = (fin.outstandingBalanceDue || 0).toFixed(2);
+                document.getElementById('mPayMethod').value = fin.paymentMethodUsed || "Tunai (Cash)";
+
+                // Keep signatures safe so they don't get deleted when editing text data
+                activeRecordSignatures = data.signatures || { mechanicToken: "", customerToken: "" };
+
+                // Rebuild dynamic line item list rows
+                const tbody = document.getElementById('mBillingRows');
+                tbody.innerHTML = "";
+                
+                if (data.invoiceItems && Array.isArray(data.invoiceItems)) {
+                    data.invoiceItems.forEach(item => {
+                        appendEditorRowHTML(item.item, item.specification, item.quantity, item.rate);
+                    });
+                }
+
+                document.getElementById('editor-container').style.display = 'block';
+                alert("📂 Data Rekod Berjaya Dimuatkan Untuk " + plate);
             } else {
-                console.log("Logged in as:", user.email);
+                document.getElementById('editor-container').style.display = 'none';
+                alert("❌ Tiada rekod dijumpai untuk no plate: " + plate);
+            }
+        } catch (err) {
+            alert("Ralat memuatkan pangkalan data: " + err.message);
+        }
+    };
+
+    function appendEditorRowHTML(desc, meta, qty, rate) {
+        const tbody = document.getElementById('mBillingRows');
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>
+                <input type="text" class="e-desc" value="${desc || ''}" placeholder="Nama barang" oninput="recalculateEditorFinancials()">
+                <input type="text" class="e-meta" value="${meta || ''}" placeholder="Butiran tambahan" style="font-size:0.8rem; margin-top:4px;" oninput="recalculateEditorFinancials()">
+            </td>
+            <td><input type="number" class="e-qty" value="${qty || 1}" min="1" oninput="recalculateEditorFinancials()"></td>
+            <td><input type="number" class="e-price" value="${parseFloat(rate || 0).toFixed(2)}" step="0.01" oninput="recalculateEditorFinancials()"></td>
+            <td><button class="btn-danger" onclick="this.parentElement.parentElement.remove(); recalculateEditorFinancials();">X</button></td>
+        `;
+        tbody.appendChild(row);
+    }
+
+    window.addEditorRow = function() {
+        appendEditorRowHTML("", "", 1, 0.00);
+    };
+
+    window.recalculateEditorFinancials = function() {
+        let computedTotal = 0;
+        const rows = document.querySelectorAll('#mBillingRows tr');
+        
+        rows.forEach(row => {
+            const q = parseFloat(row.querySelector('.e-qty').value) || 0;
+            const p = parseFloat(row.querySelector('.e-price').value) || 0;
+            computedTotal += (q * p);
+        });
+
+        const currentPaid = parseFloat(document.getElementById('mDepositCredit').value) || 0;
+        const computedOutstanding = computedTotal - currentPaid;
+
+        document.getElementById('mTotalDebit').value = computedTotal.toFixed(2);
+        document.getElementById('mBalanceDue').value = computedOutstanding.toFixed(2);
+    };
+
+    // UPDATE RECORD EXECUTOR
+    window.updateRecordInFirebase = function() {
+        const targetPlate = document.getElementById('searchPlate').value.trim().toUpperCase();
+        if(!targetPlate) return alert("Ralat: Tiada target plate dikesan!");
+
+        const updatedLineItems = [];
+        const basicPartsArray = [];
+        document.querySelectorAll('#mBillingRows tr').forEach(row => {
+            const d = row.querySelector('.e-desc').value.trim();
+            const qty = parseFloat(row.querySelector('.e-qty').value) || 1;
+            const price = parseFloat(row.querySelector('.e-price').value) || 0;
+            if(d) {
+                updatedLineItems.push({ item: d, specification: row.querySelector('.e-meta').value, quantity: qty, rate: price });
+                basicPartsArray.push(`${d} (x${qty})`);
             }
         });
 
-        // 5. Global Functions
-        window.addPartRow = function() {
-            const container = document.getElementById('partsList');
-            const div = document.createElement('div');
-            div.className = 'part-row';
-            div.innerHTML = '<input type="text" class="part-item" placeholder="e.g. Oil Filter">';
-            container.appendChild(div);
+        const finalTotal = parseFloat(document.getElementById('mTotalDebit').value) || 0;
+        const finalPaid = parseFloat(document.getElementById('mDepositCredit').value) || 0;
+        const finalBalance = parseFloat(document.getElementById('mBalanceDue').value) || 0;
+
+        const updatedPayload = {
+            customerName: document.getElementById('mCustName').value,
+            custPhone: document.getElementById('mCustPhone').value,
+            cardetails: document.getElementById('mCarModel').value,
+            lastService: document.getElementById('mServiceDate').value,
+            mileage: document.getElementById('mMileage').value,
+            carImage: document.getElementById('mCarImgUrl').value || "",
+            nextService: document.getElementById('mNextService').value,
+            partsChanged: basicPartsArray, 
+            
+            invoiceItems: updatedLineItems,
+            financials: {
+                totalDebitAmount: finalTotal,
+                depositCreditAmount: finalPaid,
+                outstandingBalanceDue: finalBalance,
+                paymentMethodUsed: document.getElementById('mPayMethod').value,
+                status: finalBalance <= 0 ? "Fully Paid" : "Balance Outstanding"
+            },
+            signatures: activeRecordSignatures, // Injected back perfectly safe without breaks
+            timestamp: new Date().toISOString()
         };
 
-        window.saveRecord = function() {
-            const plate = document.getElementById('plate').value.trim().toUpperCase();
-            if(!plate) return alert("Plate number is required!");
-
-            const parts = [];
-            document.querySelectorAll('.part-item').forEach(input => {
-                if(input.value.trim()) parts.push(input.value.trim());
-            });
-
-            const recordData = {
-                customerName: document.getElementById('custName').value,
-                cardetails: document.getElementById('carModel').value,
-                lastService: document.getElementById('serviceDate').value,
-                mileage: document.getElementById('mileage').value,
-                carImage: document.getElementById('imgUrl').value,
-                driveLink: document.getElementById('pdfUrl').value,
-                details: document.getElementById('remarks').value,
-                nextService: document.getElementById('nextService').value,
-                partsChanged: parts,
-                timestamp: new Date().toISOString()
-            };
-
-            set(ref(db, 'serviceRecords/' + plate), recordData)
-                .then(() => {
-                    alert("✅ Record Saved Successfully for " + plate);
-                    location.reload(); 
-                })
-                .catch(err => {
-                    console.error(err);
-                    alert("❌ Error: " + err.message);
-                });
-        };
-    </script>
+        const db = getActiveDatabase();
+        set(ref(db, 'serviceRecords/' + targetPlate), updatedPayload)
+            .then(() => {
+                alert("✅ Pangkalan Data Berjaya Dikemaskini untuk No Plate: " + targetPlate);
+                location.reload();
+            })
+            .catch(error => alert("❌ Gagal Mengemaskini: " + error.message));
+    };
+</script>
 </body>
 </html>
