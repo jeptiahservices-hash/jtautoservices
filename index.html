@@ -4,279 +4,114 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Open Graph / WhatsApp Meta Tags -->
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://jeptiahservices-hash.github.io/jtautoservices">
-<meta property="og:title" content="JT Auto Services | Digital Workshop Portal">
-<meta property="og:description" content="Door-to-Door Mechanic Services. View service records, track maintenance, and browse premium parts. Professional care for your vehicle.">
-
-<!-- This is the most important part for the "Workshop Look" -->
-<meta property="og:image" content="https://github.com/jeptiahservices-hash/jtautoservices/blob/6ac0c0888f2252288fd28abdcc119d96b641f85f/images/img_hero_wallpaper.jpeg">
-
-<!-- Technical bits for WhatsApp -->
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta name="theme-color" content="#0056b3"> <!-- Matches your blue accent theme -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://jeptiahservices-hash.github.io/jtautoservices">
+    <meta property="og:title" content="JT Auto Services | Digital Workshop Portal">
+    <meta property="og:description" content="Door-to-Door Mechanic Services. View service records, track maintenance, and browse premium parts. Professional care for your vehicle.">
+    <meta property="og:image" content="https://github.com/jeptiahservices-hash/jtautoservices/blob/6ac0c0888f2252288fd28abdcc119d96b641f85f/images/img_hero_wallpaper.jpeg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="theme-color" content="#0056b3"> 
     <title>JTautoServices | Door2Door Mechanic Services</title>
     <link rel="icon" type="image/png" href="https://github.com/jeptiahservices-hash/jtautoservices/blob/6ac0c0888f2252288fd28abdcc119d96b641f85f/assets/logo.png">
+    
+    <!-- LEAFLET MAPS DEPENDENCIES -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
     <style>
         :root {
-            --primary-color: #2563eb; /* Change to #dc2626 for Red theme */
+            --primary-color: #2563eb; 
             --dark-bg: #111827;
             --card-bg: #1f2937;
             --text-light: #f3f4f6;
+            --success-color: #25d366;
         }
 
         body {
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--dark-bg);
-            color: var(--text-light);
+            margin: 0; padding: 0;
+            background-color: var(--dark-bg); color: var(--text-light);
             line-height: 1.6;
         }
 
-        /* --- HEADER & LOGO --- */
         header {
             background: rgba(17, 24, 39, 0.95);
             padding: 15px 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 1000;
             border-bottom: 2px solid var(--primary-color);
         }
-        
 
-        .logo-container img {
-            height: 110px; /* Adjust based on your logo shape */
-            vertical-align: middle;
-        }
+        .logo-container img { height: 110px; vertical-align: middle; }
+        .logo-text { font-size: 1.5rem; font-weight: 800; letter-spacing: -1px; color: #fff; text-transform: uppercase; }
 
-        .logo-text {
-            font-size: 1.5rem;
-            font-weight: 800;
-            letter-spacing: -1px;
-            color: #fff;
-            text-transform: uppercase;
-        }
-
-        /* --- HERO SECTION --- */
         .hero {
-            padding: 60px 20px;
-            text-align: center;
-            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
-                        url('images/img_hero_wallpaper.jpeg');
-            background-size: cover;
-            background-position: center;
+            padding: 60px 20px; text-align: center;
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('images/img_hero_wallpaper.jpeg');
+            background-size: cover; background-position: center;
         }
 
         .cta-btn {
-            background: var(--primary-color);
-            color: white;
-            padding: 12px 25px;
-            text-decoration: none;
-            border-radius: 4px;
-            font-weight: bold;
-            display: inline-block;
-            margin-top: 20px;
+            background: var(--primary-color); color: white;
+            padding: 12px 25px; text-decoration: none; border-radius: 4px;
+            font-weight: bold; display: inline-block; margin-top: 20px;
+            cursor: pointer; border: none; font-size: 1rem;
         }
 
-        /* --- SERVICE/PRODUCT LIST --- */
         .section-padding { padding: 60px 5%; }
         h2 { text-align: center; color: var(--primary-color); text-transform: uppercase; margin-bottom: 40px; }
 
-        .service-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-        }
-
-        .service-card {
-            background: var(--card-bg);
-            padding: 25px;
-            border-radius: 8px;
-            border-left: 4px solid var(--primary-color);
-        }
-
+        .service-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .service-card { background: var(--card-bg); padding: 25px; border-radius: 8px; border-left: 4px solid var(--primary-color); }
         .service-card h3 { margin-top: 0; }
         .price { color: var(--primary-color); font-weight: bold; font-size: 1.2rem; }
 
-        /* --- WORK SHOWCASE (Images/Video) --- */
-        .work-gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 15px;
-        }
+        .work-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
+        .work-item { background: #000; border-radius: 8px; overflow: hidden; position: relative; }
+        .work-item img, .work-item video { width: 100%; height: 250px; object-fit: cover; display: block; }
+        .work-label { padding: 10px; background: var(--card-bg); font-size: 0.9rem; font-weight: 500; }
 
-        .work-item {
-            background: #000;
-            border-radius: 8px;
-            overflow: hidden;
-            position: relative;
-        }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 5%; background: #1f2937; border-bottom: 1px solid #333; }
+        .lang-buttons { display: flex; gap: 5px; }
+        .lang-buttons button { background: transparent; border: 1px solid #4b5563; color: #9ca3af; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; }
+        .lang-buttons button:hover { border-color: var(--primary-color); color: white; }
 
-        .work-item img, .work-item video {
-            width: 100%;
-            height: 250px;
-            object-fit: cover;
-            display: block;
-        }
+        .login-btn { background: transparent; border: 1px solid var(--primary-color); color: var(--primary-color); padding: 5px 15px; border-radius: 4px; text-decoration: none; font-size: 0.8rem; font-weight: bold; }
+        .login-btn:hover { background: var(--primary-color); color: white; }
 
-        .work-label {
-            padding: 10px;
-            background: var(--card-bg);
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
+        .choice-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .choice-card { background: var(--card-bg); padding: 30px; border-radius: 12px; text-decoration: none; color: white; text-align: center; border: 1px solid #333; transition: transform 0.3s, border-color 0.3s; cursor: pointer; }
+        .choice-card:hover { transform: translateY(-5px); border-color: var(--primary-color); }
+        .choice-icon { font-size: 3rem; margin-bottom: 15px; }
+        .coming-soon { opacity: 0.6; cursor: not-allowed; }
 
-        /* --- MOBILE OPTIMIZATION --- */
-        @media (max-width: 600px) {
-            .logo-text { font-size: 1.2rem; }
-            header { flex-direction: column; gap: 10px; }
-            .hero h1 { font-size: 1.8rem; }
-        }
+        .faq-item { background: #1f2937; padding: 15px 25px; margin-bottom: 15px; border-radius: 8px; text-align: left; }
+        .faq-item h4 { color: var(--primary-color); margin-bottom: 10px; margin-top: 0; }
+        .faq-item p { margin: 0; color: #ccc; font-size: 0.95rem; }
 
-    .top-bar {
-        display: flex;
-        justify-content: space-between; /* Pushes content to opposite sides */
-        align-items: center;
-        padding: 10px 5%;
-        background: #1f2937;
-        border-bottom: 1px solid #333;
-    }
+        .whatsapp-float { position: fixed; bottom: 20px; right: 20px; background-color: #25d366; color: white; padding: 10px 20px; border-radius: 50px; display: flex; align-items: center; text-decoration: none; z-index: 1001; }
+        .whatsapp-float img { width: 25px; margin-right: 10px; }
 
-    .lang-buttons {
-        display: flex;
-        gap: 5px;
-    }
+        .towing-float { position: fixed; bottom: 85px; right: 20px; background-color: #dc2626; color: white; padding: 10px 20px; border-radius: 50px; display: flex; align-items: center; text-decoration: none; z-index: 1001; font-weight: bold; animation: pulse 2s infinite; }
+        .towing-icon { margin-right: 8px; font-size: 1.2rem; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
-    .login-btn {
-        background: transparent;
-        border: 1px solid var(--primary-color);
-        color: var(--primary-color);
-        padding: 5px 15px;
-        border-radius: 4px;
-        text-decoration: none;
-        font-size: 0.8rem;
-        font-weight: bold;
-        transition: all 0.3s ease;
-    }
+        /* --- MODAL DESIGN SYSTEM --- */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-content { background: var(--card-bg); padding: 30px; border-radius: 12px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; border: 1px solid var(--primary-color); }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-size: 0.9rem; color: #9ca3af; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px; background: #111827; border: 1px solid #374151; color: white; border-radius: 6px; box-sizing: border-box; }
+        .form-row { display: flex; gap: 10px; }
+        .close-modal { float: right; cursor: pointer; font-size: 1.5rem; color: #9ca3af; }
 
-    .login-btn:hover {
-        background: var(--primary-color);
-        color: white;
-    }
+        /* --- MAP CANVAS PICKER BOX --- */
+        #mapContainer { width: 100%; height: 220px; border-radius: 6px; border: 1px solid #374151; margin-top: 8px; z-index: 1; }
+        .loc-btn { background: #4b5563; color: white; padding: 6px 12px; border: none; border-radius: 4px; font-size: 0.8rem; cursor: pointer; font-weight: bold; margin-bottom: 5px; display: inline-flex; align-items: center; gap: 4px;}
+        .loc-btn:hover { background: var(--primary-color); }
 
-    /* Keep your existing button styles but scoped to lang-buttons if needed */
-    .lang-buttons button {
-        background: transparent;
-        border: 1px solid #4b5563;
-        color: #9ca3af;
-        padding: 5px 10px;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 0.8rem;
-    }
-
-    .lang-buttons button:hover {
-        border-color: var(--primary-color);
-        color: white;
-    }
-
-.towing-float {
-    position: fixed;
-    bottom: 85px; /* Sits exactly above the WhatsApp button */
-    right: 20px;
-    background-color: #dc2626; /* Warna Button Emergency */
-    color: white;
-    padding: 10px 20px;
-    border-radius: 50px;
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-    z-index: 1001;
-    box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
-    font-weight: bold;
-    animation: pulse 2s infinite; /* Bergetar Button nya */
-}
-
-.towing-icon { margin-right: 8px; font-size: 1.2rem; }
-
-/* Optional: Subtle pulse effect to show urgency */
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
-}
-
-        .whatsapp-float {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: #25d366;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 50px;
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-    z-index: 1001;
-    box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
-}
-.whatsapp-float img { width: 25px; margin-right: 10px; }
-
-.faq-item {
-    background: #1f2937;
-    padding: 15px 25px;
-    margin-bottom: 15px;
-    border-radius: 8px;
-    text-align: left;
-}
-.faq-item h4 {
-    color: var(--primary-color);
-    margin-bottom: 10px;
-    margin-top: 0;
-}
-.faq-item p {
-    margin: 0;
-    color: #ccc;
-    font-size: 0.95rem;
-}
-
-.choice-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-}
-
-.choice-card {
-    background: var(--card-bg);
-    padding: 30px;
-    border-radius: 12px;
-    text-decoration: none;
-    color: white;
-    text-align: center;
-    border: 1px solid #333;
-    transition: transform 0.3s, border-color 0.3s;
-}
-
-.choice-card:hover {
-    transform: translateY(-5px);
-    border-color: var(--primary-color);
-}
-
-.choice-icon {
-    font-size: 3rem;
-    margin-bottom: 15px;
-}
-
-.coming-soon {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
+        @media (max-width: 600px) { .logo-text { font-size: 1.2rem; } header { flex-direction: column; gap: 10px; } .hero h1 { font-size: 1.8rem; } }
     </style>
 </head>
 <body>
@@ -284,240 +119,315 @@
     <header>
         <div class="logo-container">
             <img src="assets/logo.png" alt="Logo" onerror="this.style.display='none'">
-            <span class="logo-text">Main<span style="color:var(--primary-color)">Pages</span></span>
+            <span class="logo-text">JT Auto<span style="color:var(--primary-color)">Services</span></span>
         </div>
         <a href="tel:+60165250890" class="cta-btn" style="margin-top:0; padding: 8px 15px;">Call Now</a>
     </header>
 
     <div class="top-bar">
-    <div class="lang-buttons">
-        <button onclick="setLanguage('en')">English</button>
-        <button onclick="setLanguage('bm')">Bahasa Melayu</button>
+        <div class="lang-buttons">
+            <button onclick="setLanguage('en')">English</button>
+            <button onclick="setLanguage('bm')">Bahasa Melayu</button>
+        </div>
+        <a href="sys_login/login.html" class="login-btn" data-en="Login" data-bm="Log Masuk">Login</a>
     </div>
-    
-    <a href="sys_login/login.html" class="login-btn" data-en="Login" data-bm="Log Masuk">Login</a>
-</div>
 
     <section class="hero">
         <h1 data-en="Service And Repair" data-bm="Baik Pulih Dan Ganti">Service And Repair</h1>
         <p data-en="From oil changes to engine rebuilds, we treat your car like our own." data-bm="Dari Tukar Minyak Enjin Hingga Baik Pulih Enjin, Kami jaga kereta anda seperti kereta Kami">From oil changes to engine rebuilds, we treat your car like our own.</p>
-        <a href="#work" class="cta-btn">View Our Recent Work</a>
+        <button class="cta-btn" onclick="openBookingModal()" data-en="Book Real-Time Service" data-bm="Tempah Servis Sekarang">Book Real-Time Service</button>
     </section>
 
     <div style="display: flex; justify-content: space-around; background: #1f2937; padding: 20px; text-align: center; font-size: 0.9rem; color: #aaa;">
-    <div>
-        <strong style="color: white; display: block;">100% Genuine</strong>
-        Parts Used
+        <div><strong style="color: white; display: block;">100% Genuine</strong>Parts Used</div>
+        <div style="border-left: 1px solid #333; border-right: 1px solid #333; padding: 0 20px;"><strong style="color: white; display: block;">Quick Turnaround</strong>Same Day Service</div>
+        <div><strong style="color: white; display: block;">Expert Team</strong>Experience Mechanics</div>
     </div>
-    <div style="border-left: 1px solid #333; border-right: 1px solid #333; padding: 0 20px;">
-        <strong style="color: white; display: block;">Quick Turnaround</strong>
-        Same Day Service
-    </div>
-    <div>
-        <strong style="color: white; display: block;">Expert Team</strong>
-        Experience Mechanics
-    </div>
-</div>
 
-<section class="section-padding">
-    <h2 data-en="What are you looking for?" data-bm="Apa yang anda cari?">What are you looking for?</h2>
-    
-    <div class="choice-grid">
-        <a href="marketFB.html" class="choice-card">
-            <div class="choice-icon">⚙️</div>
-            <h3 data-en="Buy Spare Parts" data-bm="Beli Alat Ganti">Buy Spare Parts</h3>
-            <p data-en="Engine oil, filters, and more." data-bm="Minyak enjin, penapis, dan lain-lain.">Engine oil, filters, and more.</p>
-        </a>
-
-        <a href="https://wa.me/60165250890" class="choice-card">
-            <div class="choice-icon">📅</div>
-            <h3 data-en="Book a Service" data-bm="Buat Temujanji">Book a Service</h3>
-            <p data-en="Schedule your next repair." data-bm="Jadualkan Temujanji seterusnya.">Schedule your next repair.</p>
-        </a>
-        
+    <section class="section-padding">
+        <h2 data-en="What are you looking for?" data-bm="Apa yang anda cari?">What are you looking for?</h2>
         <div class="choice-grid">
-        <a href="sys_mycar/mycarFB.html" class="choice-card">
-            <div class="choice-icon">🚙</div>
-            <h3 data-en="MyCar" data-bm="MyCar">MyCar</h3>
-            <p data-en="Check Your Car Service Details" data-bm="Semak Butiran Baik Pulih kereta Anda">Check Your Car Service Details</p>
-        </a>
-        
-        <div class="choice-card coming-soon">
-            <div class="choice-icon">🚗</div>
-            <h3 data-en="Car Wash & Detail" data-bm="Cuci & Detailing">Car Wash & Detail</h3>
-            <p data-en="Coming Soon!" data-bm="Akan Datang!">Coming Soon!</p>
+            <a href="marketFB.html" class="choice-card">
+                <div class="choice-icon">⚙️</div>
+                <h3 data-en="Buy Spare Parts" data-bm="Beli Alat Ganti">Buy Spare Parts</h3>
+                <p data-en="Engine oil, filters, and more." data-bm="Minyak enjin, penapis, dan lain-lain.">Engine oil, filters, and more.</p>
+            </a>
+            <div class="choice-card" onclick="openBookingModal()">
+                <div class="choice-icon">📅</div>
+                <h3 data-en="Book a Service" data-bm="Buat Temujanji">Book a Service</h3>
+                <p data-en="Schedule your next repair." data-bm="Jadualkan Temujanji seterusnya.">Schedule your next repair.</p>
+            </div>
+            <a href="sys_mycar/mycarFB.html" class="choice-card">
+                <div class="choice-icon">🚙</div>
+                <h3 data-en="MyCar" data-bm="MyCar">MyCar</h3>
+                <p data-en="Check Your Car Service Details" data-bm="Semak Butiran Baik Pulih kereta Anda">Check Your Car Service Details</p>
+            </a>
+            <div class="choice-card coming-soon">
+                <div class="choice-icon">🚗</div>
+                <h3 data-en="Car Wash & Detail" data-bm="Cuci & Detailing">Car Wash & Detail</h3>
+                <p data-en="Coming Soon!" data-bm="Akan Datang!">Coming Soon!</p>
+            </div>
         </div>
-        
-        
-    </div>
-</section>
+    </section>
 
     <section class="section-padding">
         <h2>Maintenance & Parts</h2>
         <div class="service-grid">
-            <div class="service-card">
-                <h3>Engine Oil Change</h3>
-                <p>Includes filter replacement and 21-point safety inspection.</p>
-                <div class="price">From RM150</div>
-            </div>
-            <div class="service-card">
-                <h3>Brake Pad Replacement</h3>
-                <p>High-quality ceramic pads for better stopping power.</p>
-                <div class="price">From RM170</div>
-            </div>
-            <div class="service-card">
-                <h3>Diagnostic Scan</h3>
-                <p>Advanced computer diagnostics to find hidden engine faults.</p>
-                <div class="price">RM60</div>
-            </div>
+            <div class="service-card"><h3>Engine Oil Change</h3><p>Includes filter replacement and 21-point safety inspection.</p><div class="price">From RM150</div></div>
+            <div class="service-card"><h3>Brake Pad Replacement</h3><p>High-quality ceramic pads for better stopping power.</p><div class="price">From RM170</div></div>
+            <div class="service-card"><h3>Diagnostic Scan</h3><p>Advanced computer diagnostics to find hidden engine faults.</p><div class="price">RM60</div></div>
         </div>
     </section>
 
     <section id="work" class="section-padding" style="background: #1a222f;">
         <h2>Our Recent Works</h2>
         <div class="work-gallery">
-            
-            <div class="work-item">
-                <img src="images/img_service1.jpg" alt="Work Done 1">
-                <div class="work-label">Service Kereta Dirumah Pelangan</div>
-            </div>
-
-            <div class="work-item">
-                <img src="images/img_service2.jpg" alt="Work Done 1">
-                <div class="work-label">Penukaran Balljoint dan Lower Arm</div>
-            </div>
-
-            <div class="work-item">
-                <video controls poster="video-thumb.jpg">
-                    <source src="exhaust-sound.mp4" type="video/mp4">
-                    Your browser does not support videos.
-                </video>
-                <div class="work-label">Exhaust Install (Before & After)</div>
-            </div>
-
-            <div class="work-item">
-                <img src="images/img_service3.jpg" alt="Work Done 2">
-                <div class="work-label">Penukaran Bearing Coupling Long Shaft</div>
-            </div>
-
+            <div class="work-item"><img src="images/img_service1.jpg" alt="Work 1"><div class="work-label">Service Kereta Dirumah Pelangan</div></div>
+            <div class="work-item"><img src="images/img_service2.jpg" alt="Work 2"><div class="work-label">Penukaran Balljoint dan Lower Arm</div></div>
+            <div class="work-item"><video controls poster="video-thumb.jpg"><source src="exhaust-sound.mp4" type="video/mp4"></video><div class="work-label">Exhaust Install (Before & After)</div></div>
+            <div class="work-item"><img src="images/img_service3.jpg" alt="Work 3"><div class="work-label">Penukaran Bearing Coupling Long Shaft</div></div>
         </div>
     </section>
 
     <section id="contact" class="section-padding" style="background: #111827; border-top: 1px solid #333;">
-    <h2>Get in Touch</h2>
-    <div style="max-width: 800px; margin: 0 auto; text-align: center;">
+        <h2>Get in Touch</h2>
+        <div style="max-width: 800px; margin: 0 auto; text-align: center;">
+            <p style="font-size: 1.2rem; margin-bottom: 30px;">Need a repair or a quote? Contact us directly or visit our shop.</p>
+            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-bottom: 40px;">
+                <a href="https://wa.me/60165250890" target="_blank" style="background: #25d366; color: white; padding: 15px 25px; border-radius: 8px; text-decoration: none; font-weight: bold; display: flex; align-items: center;"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" width="20" style="margin-right: 10px;">WhatsApp Us</a>
+                <a href="tel:+60165250890" style="background: #2563eb; color: white; padding: 15px 25px; border-radius: 8px; text-decoration: none; font-weight: bold;">Call +6016 525 0890</a>
+                <a href="https://maps.app.goo.gl/vs9KbBEYy5Z7jmjk6" target="_blank" style="background: white; color: #4285F4; border: 2px solid #4285F4; padding: 15px 25px; border-radius: 8px; text-decoration: none; font-weight: bold;">Find us on Google Maps</a>
+                <a href="https://maps.app.goo.gl/FmBGax2VacFFZ9WH6" target="_blank" style="background: hsl(60, 98%, 49%); color: hwb(0 5% 94%); border: 2px solid hwb(0 3% 97%); padding: 15px 25px; border-radius: 8px; text-decoration: none; font-weight: bold;">Rate us on Google Maps</a>
+            </div>
+            <div style="background: #1f2937; padding: 30px; border-radius: 12px; display: inline-block; text-align: left;">
+                <p>📍 <strong data-en="Location:" data-bm="Lokasi:">Location:</strong> Kampung Semarang Dengkil Selangor</p>
+                <p>⏰ <strong data-en="Hours:" data-bm="Waktu:">Hours:</strong> Mon - Sat: 8:00 AM - 6:00 PM</p>
+                <p>📧 <strong>Email:</strong> jeptiah.services@email.com</p>
+            </div>
+        </div>
+    </section>
         
-        <p style="font-size: 1.2rem; margin-bottom: 30px;">
-            Need a repair or a quote? Contact us directly or visit our shop.
-        </p>
-
-        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-bottom: 40px;">
-            
-            <a href="https://wa.me/60165250890" target="_blank" 
-               style="background: #25d366; color: white; padding: 15px 25px; border-radius: 8px; text-decoration: none; font-weight: bold; display: flex; align-items: center;">
-               <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" width="20" style="margin-right: 10px;">
-               WhatsApp Us
-            </a>
-
-            <a href="tel:+60165250890" 
-               style="background: #2563eb; color: white; padding: 15px 25px; border-radius: 8px; text-decoration: none; font-weight: bold;">
-               Call +6016 525 0890
-            </a>
-
-            <a href="https://maps.app.goo.gl/vs9KbBEYy5Z7jmjk6" target="_blank" 
-               style="background: white; color: #4285F4; border: 2px solid #4285F4; padding: 15px 25px; border-radius: 8px; text-decoration: none; font-weight: bold;">
-               Find us on Google Maps
-            </a>
-
-             <a href="https://maps.app.goo.gl/FmBGax2VacFFZ9WH6" target="_blank" 
-               style="background: hsl(60, 98%, 49%); color: hwb(0 5% 94%); border: 2px solid hwb(0 3% 97%); padding: 15px 25px; border-radius: 8px; text-decoration: none; font-weight: bold;">
-               Rate us on Google Maps
-            </a>
-        </div>
-
-        <div style="background: #1f2937; padding: 30px; border-radius: 12px; display: inline-block; text-align: left;">
-            <p>📍 <strong data-en="Location:" data-bm="Lokasi:">Location:</strong> Kampung Semarang Dengkil Selangor</p>
-            <p>⏰ <strong data-en="Hours:" data-bm="Waktu:">Hours:</strong> Mon - Sat: 8:00 AM - 6:00 PM</p>
-            <p>📧 <strong>Email:</strong> jeptiah.services@email.com</p>
-        </div>
-
-    </div>
-</section>
-    </header>
-    
     <section id="faq" class="section-padding" style="background: #1a222f;">
-    <h2 data-en="Frequently Asked Questions" data-bm="Soalan Lazim">Frequently Asked Questions</h2>
-    <div style="max-width: 700px; margin: 0 auto;">
-
-        <div class="faq-item">
-            <h4 data-en="How long does a basic service take?" data-bm="Berapa lama servis biasa diambil?">
-                How long does a basic service take?
-            </h4>
-            <p data-en="Standard oil change and inspection usually takes 45-60 minutes." 
-               data-bm="Tukar minyak hitam dan pemeriksaan biasa biasanya mengambil masa 45-60 minit.">
-               Standard oil change and inspection usually takes 45-60 minutes.
-            </p>
+        <h2>Frequently Asked Questions</h2>
+        <div style="max-width: 700px; margin: 0 auto;">
+            <div class="faq-item"><h4>How long does a basic service take?</h4><p>Standard oil change and inspection usually takes 45-60 minutes.</p></div>
+            <div class="faq-item"><h4>Do you provide a warranty for repairs?</h4><p>Yes, we provide a 3 to 6 month warranty on most parts and labor.</p></div>
+            <div class="faq-item"><h4>Can I bring my own engine oil?</h4><p>Yes, we can perform the service with your parts, charging only for labor.</p></div>
         </div>
+    </section>
 
-        <div class="faq-item">
-            <h4 data-en="Do you provide a warranty for repairs?" data-bm="Adakah anda menyediakan waranti untuk pembaikan?">
-                Do you provide a warranty for repairs?
-            </h4>
-            <p data-en="Yes, we provide a 3 to 6 month warranty on most parts and labor." 
-               data-bm="Ya, kami menyediakan waranti 3 hingga 6 bulan untuk kebanyakan alat ganti dan upah.">
-               Yes, we provide a 3 to 6 month warranty on most parts and labor.
-            </p>
+    <footer style="text-align: center; padding: 20px; color: #666; font-size: 0.8rem;">&copy; 2026 JT Auto Services. All rights reserved.</footer>
+
+    <a href="https://wa.me/+60165250890" class="whatsapp-float" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp"><span>Chat with us</span></a>
+    <a href="tel:+60189406577" class="towing-float"><span class="towing-icon">🚨</span><span>Emergency Towing</span></a>
+
+    <!-- --- BOOKING MODAL WITH INTEGRATED PICKER MAP --- -->
+    <div class="modal" id="bookingModal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeBookingModal()">&times;</span>
+            <h3 style="margin-top:0;" data-en="Schedule Appointment" data-bm="Borang Temujanji">Schedule Appointment</h3>
+            <form id="bookingForm">
+                <div class="form-group">
+                    <label data-en="Full Name" data-bm="Nama Penuh">Full Name</label>
+                    <input type="text" id="custName" required>
+                </div>
+                <div class="form-group">
+                    <label data-en="Phone Number" data-bm="No. Telefon">Phone Number</label>
+                    <input type="tel" id="custPhone" placeholder="e.g. +60123456789" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group" style="flex:1;">
+                        <label data-en="Car Model" data-bm="Model Kereta">Car Model</label>
+                        <input type="text" id="carModel" placeholder="e.g. Myvi, Vios" required>
+                    </div>
+                    <div class="form-group" style="flex:1;">
+                        <label data-en="Plate Number" data-bm="Nombor Plat">Plate Number</label>
+                        <input type="text" id="carPlate" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label data-en="Service Date & Time" data-bm="Tarikh & Masa Servis">Service Date & Time</label>
+                    <div class="form-row">
+                        <input type="date" id="serviceDate" required>
+                        <select id="serviceTime" required>
+                            <option value="08:00">08:00 AM</option>
+                            <option value="10:00">10:00 AM</option>
+                            <option value="12:00">12:00 PM</option>
+                            <option value="14:00">02:00 PM</option>
+                            <option value="16:00">04:00 PM</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label data-en="Service Location Type" data-bm="Jenis Lokasi Servis">Service Location Type</label>
+                    <select id="locationType" onchange="toggleLocationField()" required>
+                        <option value="Workshop">Drop-off at Workshop (Dengkil)</option>
+                        <option value="DoorToDoor">Door-to-Door Service (Select on Map)</option>
+                    </select>
+                </div>
+                
+                <!-- DYNAMIC TARGET CONTAINER FOR MAP INTERACTIVES -->
+                <div class="form-group" id="mapPickerGroup" style="display:none;">
+                    <label data-en="Pin Your Delivery Location" data-bm="Tandakan Lokasi Anda Pada Peta">Pin Your Service Location</label>
+                    <button type="button" class="loc-btn" onclick="geolocateUser()">📍 Use My Current Location</button>
+                    <div id="mapContainer"></div>
+                    <!-- Hidden fields holding actual data coordinates -->
+                    <input type="hidden" id="latCoord" value="">
+                    <input type="hidden" id="lngCoord" value="">
+                </div>
+
+                <div class="form-group">
+                    <label data-en="Describe Issues / Problems" data-bm="Butiran Masalah Kereta">Describe Issues / Problems</label>
+                    <textarea id="custProblems" rows="3" required></textarea>
+                </div>
+                <button type="submit" class="cta-btn" style="width:100%;">Submit Booking</button>
+            </form>
         </div>
-
-        <div class="faq-item">
-            <h4 data-en="Can I bring my own engine oil?" data-bm="Bolehkah saya bawa minyak Hitam / Enjen sendiri?">
-                Can I bring my own engine oil?
-            </h4>
-            <p data-en="Yes, we can perform the service with your parts, charging only for labor." 
-               data-bm="Mesti lah Boleh, kami boleh lakukan servis dengan alat ganti yang anda telah beli, hanya caj pada upah sahaja.">
-               Yes, we can perform the service with your parts, charging only for labor.
-            </p>
-        </div>
-
     </div>
-</section>
 
-    <footer style="text-align: center; padding: 20px; color: #666; font-size: 0.8rem;">
-        &copy; 2026 JT auto Services. All rights reserved.
-    </footer>
+    <!-- --- FIREBASE DATABASE CONTROL CORE --- -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-    <a href="https://wa.me/+60165250890" class="whatsapp-float" target="_blank">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
-    <span data-en="Chat with us" data-bm="Hubungi kami">Chat with us</span>
-</a>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAOkSn53iUrBiHO-5wS1t4vcJwW46yAoqs",
+            authDomain: "jtautoservices-metadata.firebaseapp.com",
+            databaseURL: "https://jtautoservices-metadata-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "jtautoservices-metadata",
+            storageBucket: "jtautoservices-metadata.firebasestorage.app",
+            messagingSenderId: "426427161628",
+            appId: "1:426427161628:web:22a0f220400cfc5c1a93d9"
+        };
 
-<a href="tel:+60189406577" class="towing-float">
-    <span class="towing-icon">🚨</span>
-    <span data-en="Emergency Towing" data-bm="Trak Tunda Kecemasan">Emergency Towing</span>
-</a>
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
 
-<script>
-function setLanguage(lang) {
-    const elements = document.querySelectorAll('[data-en]');
-    elements.forEach(el => {
-        const text = el.getAttribute('data-' + lang);
-        if (text) {
-            // Check if it's an input/placeholder or standard text
-            if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-                el.placeholder = text;
+        document.getElementById('bookingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const type = document.getElementById('locationType').value;
+            let lat = document.getElementById('latCoord').value;
+            let lng = document.getElementById('lngCoord').value;
+
+            if (type === 'DoorToDoor' && (!lat || !lng)) {
+                alert('Please pick a location point on the map canvas container.');
+                return;
+            }
+
+            const bookingData = {
+                name: document.getElementById('custName').value,
+                phone: document.getElementById('custPhone').value,
+                carModel: document.getElementById('carModel').value,
+                plateNumber: document.getElementById('carPlate').value,
+                date: document.getElementById('serviceDate').value,
+                time: document.getElementById('serviceTime').value,
+                locationType: type,
+                latitude: type === 'DoorToDoor' ? parseFloat(lat) : 2.8794, 
+                longitude: type === 'DoorToDoor' ? parseFloat(lng) : 101.6781,
+                problems: document.getElementById('custProblems').value,
+                status: 'Pending',
+                createdAt: new Date().toISOString()
+            };
+
+            push(ref(database, 'bookings'), bookingData)
+                .then(() => {
+                    alert('Booking successfully sent! We will contact you shortly.');
+                    document.getElementById('bookingForm').reset();
+                    closeBookingModal();
+                })
+                .catch((error) => { alert('Submission error. Please try again.'); });
+        });
+    </script>
+
+    <!-- --- MAP RENDERING CONTROL LAYER --- -->
+    <script>
+        let map;
+        let pickerMarker;
+        // Default Map Focus center points at Dengkil, Selangor region
+        const defaultLat = 2.8794;
+        const defaultLng = 101.6781;
+
+        function openBookingModal() { 
+            document.getElementById('bookingModal').style.display = 'flex'; 
+            // Invalidate layout sizes to fix async layout engine loading issues inside modal boxes
+            setTimeout(() => { if (map) map.invalidateSize(); }, 350);
+        }
+        
+        function closeBookingModal() { document.getElementById('bookingModal').style.display = 'none'; }
+        
+        function toggleLocationField() {
+            const type = document.getElementById('locationType').value;
+            const group = document.getElementById('mapPickerGroup');
+            
+            if (type === 'DoorToDoor') {
+                group.style.display = 'block';
+                initializePickerMap();
             } else {
-                el.innerText = text;
+                group.style.display = 'none';
             }
         }
-    });
-    localStorage.setItem('preferredLang', lang);
-}
 
-window.onload = () => {
-    const savedLang = localStorage.getItem('preferredLang') || 'en';
-    setLanguage(savedLang);
-};
-</script>
+        function initializePickerMap() {
+            if (map) return; // Stop redundant reload executions
 
+            // Mount Leaflet container canvas
+            map = L.map('mapContainer').setView([defaultLat, defaultLng], 13);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            // Spawn active draggable anchor pinning handle
+            pickerMarker = L.marker([defaultLat, defaultLng], { draggable: true }).addTo(map);
+            
+            // Prime default value sets down immediately
+            updateCoordinatesField(defaultLat, defaultLng);
+
+            // Listen to dragging motion adjustments
+            pickerMarker.on('dragend', function (e) {
+                const position = pickerMarker.getLatLng();
+                updateCoordinatesField(position.lat, position.lng);
+            });
+
+            // Listen to click coordinates shortcuts on map body
+            map.on('click', function(e) {
+                pickerMarker.setLatLng(e.latlng);
+                updateCoordinatesField(e.latlng.lat, e.latlng.lng);
+            });
+        }
+
+        function updateCoordinatesField(lat, lng) {
+            document.getElementById('latCoord').value = lat;
+            document.getElementById('lngCoord').value = lng;
+        }
+
+        function geolocateUser() {
+            if (!navigator.geolocation) {
+                alert('Geolocation tracking engine unavailable on your current web browser device.');
+                return;
+            }
+            navigator.geolocation.getCurrentPosition((position) => {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                if(map && pickerMarker) {
+                    map.setView([lat, lng], 16);
+                    pickerMarker.setLatLng([lat, lng]);
+                    updateCoordinatesField(lat, lng);
+                }
+            }, () => {
+                alert('Unable to capture precise GPS positions. Please drag pin manually.');
+            });
+        }
+
+        function setLanguage(lang) {
+            const elements = document.querySelectorAll('[data-en]');
+            elements.forEach(el => {
+                const text = el.getAttribute('data-' + lang);
+                if (text) el.innerText = text;
+            });
+        }
+    </script>
 </body>
 </html>
