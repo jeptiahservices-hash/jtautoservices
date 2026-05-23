@@ -11,6 +11,7 @@
             --surface: #1e293b;
             --border: #334155;
             --text: #f8fafc;
+            --danger: #dc2626;
         }
         body {
             font-family: 'Segoe UI', system-ui, sans-serif;
@@ -19,6 +20,49 @@
             margin: 0; padding: 20px;
         }
         h2 { border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-bottom: 30px;}
+        
+        /* --- ADMIN AUTH BANNER UI --- */
+        .auth-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 400px;
+            margin: 40px auto;
+            text-align: center;
+        }
+        .auth-card input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            background: #111827;
+            border: 1px solid var(--border);
+            color: white;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .admin-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+        }
+        .logout-btn {
+            background: transparent;
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        /* --- DASHBOARD CONTROLS --- */
+        #adminDashboard { display: none; }
         
         .timeline-container {
             display: flex;
@@ -80,30 +124,50 @@
 </head>
 <body>
 
-    <h2>🛠️ JT Auto Booking Manager Panel</h2>
-
-    <h3 style="color:#9ca3af;">📅 Upcoming Timeline Schedule</h3>
-    <div class="timeline-container" id="timelineView"></div>
-
-    <h3 style="color:#9ca3af; margin-top:40px;">📋 All Service Requests</h3>
-    <div style="overflow-x:auto;">
-        <table>
-            <thead>
-                <tr>
-                    <th>Customer / Vehicle</th>
-                    <th>Date & Time</th>
-                    <th>Location Mode</th>
-                    <th>Issues / Problems</th>
-                    <th>Manage Status</th>
-                </tr>
-            </thead>
-            <tbody id="tableDetailsBody"></tbody>
-        </table>
+    <!-- --- AUTH SCREEN BLOCK --- -->
+    <div id="authContainer" class="auth-card">
+        <h3 style="margin-top:0; color: var(--primary);">Secure Admin Gate</h3>
+        <p style="font-size:0.9rem; color:#9ca3af;">Please sign in to read secure booking nodes.</p>
+        <form id="loginForm">
+            <input type="email" id="loginEmail" placeholder="Admin Email" required>
+            <input type="password" id="loginPassword" placeholder="Password" required>
+            <button type="submit" class="admin-btn">Log In</button>
+        </form>
     </div>
 
+    <!-- --- SECURE PANEL INTERFACE --- -->
+    <div id="adminDashboard">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary); margin-bottom: 30px; padding-bottom: 10px;">
+            <h2 style="border:none; margin:0; padding:0;">🛠️ JT Auto Booking Manager Panel</h2>
+            <button class="logout-btn" id="logoutBtn">Secure Log Out</button>
+        </div>
+
+        <h3 style="color:#9ca3af;">📅 Upcoming Timeline Schedule</h3>
+        <div class="timeline-container" id="timelineView"></div>
+
+        <h3 style="color:#9ca3af; margin-top:40px;">📋 All Service Requests</h3>
+        <div style="overflow-x:auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Customer / Vehicle</th>
+                        <th>Date & Time</th>
+                        <th>Location Mode</th>
+                        <th>Issues / Problems</th>
+                        <th>Manage Status</th>
+                    </tr>
+                </thead>
+                <tbody id="tableDetailsBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- --- COMPREHENSIVE MODULAR DRIVER --- -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        // Imported Authentication module to unlock read capabilities securely
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAOkSn53iUrBiHO-5wS1t4vcJwW46yAoqs",
@@ -117,22 +181,65 @@
 
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
-        const bookingsRef = ref(database, 'bookings');
+        const auth = getAuth(app);
+        
+        let activeBookingsListener = null;
 
-        onValue(bookingsRef, (snapshot) => {
-            const data = snapshot.val();
-            if (!data) {
-                document.getElementById('timelineView').innerHTML = '<p style="padding:15px; color:#6b7280;">No entries scheduled.</p>';
-                document.getElementById('tableDetailsBody').innerHTML = '<tr><td colspan="5" style="text-align:center; color:#6b7280;">Empty database records.</td></tr>';
-                return;
+        // Monitoring Session Status Flow
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Admin valid: Reveal Dashboard, Hide Login form
+                document.getElementById('authContainer').style.display = 'none';
+                document.getElementById('adminDashboard').style.display = 'block';
+                startDatabaseSync();
+            } else {
+                // Admin invalid: Lock UI, Show Login form
+                document.getElementById('authContainer').style.display = 'block';
+                document.getElementById('adminDashboard').style.display = 'none';
+                cleanUiViews();
             }
-
-            const bookingsList = Object.keys(data).map(key => ({ id: key, ...data[key] }));
-            bookingsList.sort((a, b) => new Date(`${a.date}T${a.time}`) - new Date(`${b.date}T${b.time}`));
-
-            renderTimeline(bookingsList);
-            renderTableDetails(bookingsList);
         });
+
+        // Handle Login Submission
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const pass = document.getElementById('loginPassword').value;
+
+            signInWithEmailAndPassword(auth, email, pass)
+                .catch(err => alert("Access Denied: " + err.message));
+        });
+
+        // Handle Logout Action
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            signOut(auth);
+        });
+
+        // Synchronize Active Bookings Tree
+        function startDatabaseSync() {
+            const bookingsRef = ref(database, 'bookings');
+            activeBookingsListener = onValue(bookingsRef, (snapshot) => {
+                const data = snapshot.val();
+                if (!data) {
+                    document.getElementById('timelineView').innerHTML = '<p style="padding:15px; color:#6b7280;">No entries scheduled.</p>';
+                    document.getElementById('tableDetailsBody').innerHTML = '<tr><td colspan="5" style="text-align:center; color:#6b7280;">Empty database records.</td></tr>';
+                    return;
+                }
+
+                const bookingsList = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+                bookingsList.sort((a, b) => new Date(`${a.date}T${a.time}`) - new Date(`${b.date}T${b.time}`));
+
+                renderTimeline(bookingsList);
+                renderTableDetails(bookingsList);
+            }, (error) => {
+                console.error("Database Read Blocked: ", error);
+            });
+        }
+
+        function cleanUiViews() {
+            document.getElementById('timelineView').innerHTML = '';
+            document.getElementById('tableDetailsBody').innerHTML = '';
+        }
 
         function renderTimeline(bookings) {
             const container = document.getElementById('timelineView');
