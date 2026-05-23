@@ -127,7 +127,7 @@
                     
                     const isFullyPaid = parseFloat(fin.outstandingBalanceDue) <= 0;
                     const statusBadgeHTML = isFullyPaid 
-                        ? `<span class="status-badge badge-paid">✓ FULLY PAID (LUNAS)</span>`
+                        ? `<span class="status-badge badge-paid">✓ FULLY PAID</span>`
                         : `<span class="status-badge badge-debt">⚠️ BALANCE OUTSTANDING</span>`;
 
                     resultDiv.innerHTML = `
@@ -206,7 +206,7 @@
                             </div>
                         </div>
                         <div style="text-align:right;">
-                            <h2 style="margin:0; color:#007bff; font-size:1.8em;">RECEIPT</h2>
+                            <h2 style="margin:0; color:#007bff; font-size:1.3em;">RECEIPT</h2>
                             <p style="margin:4px 0 0 0; font-size:13px;"><strong>No Plate:</strong> ${currentPlate}</p>
                             <p style="margin:2px 0 0 0; font-size:13px;"><strong>Tarikh:</strong> ${d.lastService || '-'}</p>
                         </div>
@@ -240,7 +240,7 @@
                         <div>Jumlah Telah Dibayar (Paid): <strong>RM ${parseFloat(fin.depositCreditAmount).toFixed(2)}</strong></div>
                         <div style="border-top:1px solid #333; margin-top:5px; padding-top:5px; font-size:16px;">
                             ${isFullyPaid 
-                                ? `<strong style="color:green; font-size: 1.2rem;">✓ PAID IN FULL (LUNAS)</strong>` 
+                                ? `<strong style="color:green; font-size: 1.2rem;">✓ PAID IN FULL</strong>` 
                                 : `Baki Akhir (Balance Due): <strong style="color:red;">RM ${parseFloat(fin.outstandingBalanceDue).toFixed(2)}</strong>`}
                         </div>
                     </div>
