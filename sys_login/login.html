@@ -23,7 +23,7 @@
             height: 100vh; display: flex; flex-direction: column;
         }
 
-        /* --- 1. LOGIN SCREEN STYLING (Hidden after login) --- */
+        /* --- 1. LOGIN SCREEN STYLING --- */
         #login-overlay {
             position: fixed; top:0; left:0; width:100vw; height:100vh;
             background-color: var(--bg); display: flex; justify-content: center;
@@ -47,7 +47,7 @@
         .login-card button:hover { background-color: #0056b3; }
         #message { color: var(--danger); font-size: 14px; margin-top: 1rem; min-height: 20px; }
 
-        /* --- 2. MAIN DASHBOARD STYLING (Hidden before login) --- */
+        /* --- 2. MAIN DASHBOARD STYLING --- */
         #dashboard-view { display: none; flex-direction: column; height: 100vh; width: 100%; }
         header {
             background-color: var(--card); color: white; padding: 15px 30px;
@@ -58,12 +58,45 @@
         .company-name { font-size: 24px; font-weight: bold; letter-spacing: 1px; }
         .contact-info { font-size: 14px; color: var(--text-dim); display: flex; align-items: center; gap: 15px; }
         
-        nav { background: var(--nav-bg); padding: 12px; text-align: center; border-bottom: 1px solid #333; }
-        nav button { 
-            padding: 10px 20px; margin: 5px; cursor: pointer; background-color: #2c2c2c;
-            color: var(--text); border: 1px solid #444; border-radius: 6px; font-weight: 500; transition: all 0.3s ease;
+        /* --- UPGRADED DROPDOWN NAVIGATION BAR --- */
+        nav { 
+            background: var(--nav-bg); 
+            padding: 10px 30px; 
+            border-bottom: 1px solid #333;
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
-        nav button:hover, nav button.active { background-color: var(--accent); color: white; border-color: var(--accent); }
+        .nav-label {
+            font-size: 14px;
+            color: var(--text-dim);
+            font-weight: 500;
+        }
+        .page-selector {
+            background-color: #2c2c2c;
+            color: #ffffff;
+            border: 1px solid #444;
+            padding: 10px 15px;
+            font-size: 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 280px;
+            outline: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        .page-selector:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        }
+        .shortcut-hint {
+            font-size: 12px;
+            color: #666;
+            background: #222;
+            padding: 3px 6px;
+            border-radius: 4px;
+            border: 1px solid #333;
+        }
         
         iframe { border: none; background-color: var(--bg); flex-grow: 1; width: 100%; }
         
@@ -76,7 +109,6 @@
 </head>
 <body>
 
-    <!-- STAGE 1: LOCKDOWN LOGIN OVERLAY -->
     <div id="login-overlay">
         <div class="login-card">
             <img src="Data/images/logo.png" alt="Company Logo" class="company-logo" onerror="this.src='images/logow.png'">
@@ -90,7 +122,6 @@
         </div>
     </div>
 
-    <!-- STAGE 2: CONTROL WORKSPACE (Unlocked strictly on authenticated state validation) -->
     <div id="dashboard-view">
         <header>
             <div class="logo-container">
@@ -103,21 +134,24 @@
             </div>
         </header>
 
-        <nav id="navBarTabs">
-            <button class="active" onclick="changePage('Data/pages/billgen.html', this)">🛠️ JTS Admin Pro</button>
-            <button onclick="changePage('Data/pages/about.html', this)">📈 Boss Analytics</button>
-            <button onclick="changePage('Data/pages/worksumery.html', this)">🔧 works Records</button>
-            <button onclick="changePage('Data/pages/oders.html', this)">🙋‍♂️ Customer Order</button>
-            <button onclick="changePage('Data/pages/market-admin.html', this)">🛒 Market Admin</button>
-            <button onclick="changePage('Data/pages/mycar-admin.html', this)">🚗 MyCar Admin</button>
-            <button onclick="changePage('Data/pages/book-admin.html', this)">📆 Booking Admin</button>
-            <button onclick="changePage('Data/pages/about.html', this)">About Us</button>
+        <nav>
+            <span class="nav-label">Workspace Module:</span>
+            <select id="pageSelector" class="page-selector">
+                <option value="Data/pages/billgen.html">🛠️ JTS Admin Pro</option>
+                <option value="Data/pages/about.html">📈 Boss Analytics</option>
+                <option value="Data/pages/worksumery.html">🔧 Works Records</option>
+                <option value="Data/pages/oders.html">🙋‍♂️ Customer Order</option>
+                <option value="Data/pages/market-admin.html">🛒 Market Admin</option>
+                <option value="Data/pages/mycar-admin.html">🚗 MyCar Admin</option>
+                <option value="Data/pages/book-admin.html">📆 Booking Admin</option>
+                <option value="Data/pages/about.html">ℹ️ About Us</option>
+            </select>
+            <span class="shortcut-hint">Press Ctrl + K to quick-switch</span>
         </nav>
 
         <iframe id="main-view" src="Data/pages/billgen.html"></iframe>
     </div>
 
-    <!-- CENTRALIZED CORE ARCHITECTURE MODULE SCRIPT -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
@@ -138,13 +172,15 @@
         const loginOverlay = document.getElementById('login-overlay');
         const dashboardView = document.getElementById('dashboard-view');
         const msgElement = document.getElementById('message');
+        const pageSelector = document.getElementById('pageSelector');
+        const mainView = document.getElementById('main-view');
 
         // 1. Core Gatekeeper: Monitor auth state continuously
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 console.log("Session verified for user:", user.email);
-                loginOverlay.style.display = 'none'; // Dismiss login wrapper
-                dashboardView.style.display = 'flex'; // Display the full app
+                loginOverlay.style.display = 'none';
+                dashboardView.style.display = 'flex';
             } else {
                 console.log("No valid session token. Halting view access.");
                 dashboardView.style.display = 'none';
@@ -194,16 +230,18 @@
             });
         });
 
-        // 4. Standalone page swapper navigation route logic
-        window.changePage = function(pageUrl, currentButton) {
-            document.getElementById('main-view').src = pageUrl;
-            
-            if (currentButton) {
-                const buttons = document.querySelectorAll('#navBarTabs button');
-                buttons.forEach(btn => btn.classList.remove('active'));
-                currentButton.classList.add('active');
+        // 4. UPGRADED: Dropdown Navigation Event Listener
+        pageSelector.addEventListener('change', function() {
+            mainView.src = this.value;
+        });
+
+        // 5. BONUS PRODUCTIVITY FEATURE: Keyboard Shortcut (Ctrl + K or Cmd + K)
+        window.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault(); // Stop default browser search bars
+                pageSelector.focus(); // Jump cursor directly to your workspace selection menu
             }
-        };
+        });
     </script>
 </body>
 </html>
